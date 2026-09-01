@@ -12,9 +12,9 @@ type FieldWrapperProps = {
   children: React.ReactNode;
 };
 
-function FieldWrapper({ label, error, className = "", children }: FieldWrapperProps) {
+function FieldWrapper({ label, error, className, children }: FieldWrapperProps) {
   return (
-    <div className={`flex w-full max-w-[280px] flex-col gap-(--space-1) ${className}`}>
+    <div className={`flex w-full flex-col gap-(--space-1) ${className || "max-w-[280px]"}`}>
       <label className={labelBase}>{label}</label>
       {children}
       {error ? <span className="text-xs text-critical">{error}</span> : null}
@@ -29,7 +29,7 @@ type TextFieldProps = InputHTMLAttributes<HTMLInputElement> & {
 
 export function TextField({ label, error, className, ...props }: TextFieldProps) {
   return (
-    <FieldWrapper label={label} error={error}>
+    <FieldWrapper label={label} error={error} className={className}>
       <input
         className={`${controlBase} ${error ? "border-critical" : ""}`}
         aria-invalid={Boolean(error)}
@@ -46,7 +46,7 @@ type SelectFieldProps = SelectHTMLAttributes<HTMLSelectElement> & {
 
 export function SelectField({ label, error, className, children, ...props }: SelectFieldProps) {
   return (
-    <FieldWrapper label={label} error={error}>
+    <FieldWrapper label={label} error={error} className={className}>
       <select className={`${controlBase} ${error ? "border-critical" : ""}`} {...props}>
         {children}
       </select>

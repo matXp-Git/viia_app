@@ -1,0 +1,41 @@
+import Link from "next/link";
+import { redirect } from "next/navigation";
+import { getAppUser } from "@/lib/supabase/session";
+import { roleHome } from "@/lib/roles";
+import { signOut } from "@/lib/auth-actions";
+import { Eyebrow } from "@/components/ui/Eyebrow";
+
+const navLinks = [
+  { href: "/manager", label: "Missions" },
+  { href: "/manager/villes", label: "Villes" },
+  { href: "/manager/operateurs", label: "Opérateurs" },
+  { href: "/manager/clients", label: "Clients" },
+  { href: "/manager/utilisateurs", label: "Utilisateurs" },
+];
+
+export default async function ManagerLayout({ children }: { children: React.ReactNode }) {
+  const appUser = await getAppUser();
+  if (!appUser) redirect("/login");
+  if (appUser.role !== "manager") redirect(roleHome(appUser.role));
+
+  return (
+    <div className="mx-auto max-w-(--container-max) px-(--gutter) py-(--space-7)">
+      <header className="mb-(--space-7) flex flex-wrap items-center justify-between gap-(--space-4) border-b border-line pb-(--space-4)">
+        <Eyebrow>Dashboard manager</Eyebrow>
+        <nav className="flex flex-wrap gap-(--space-5) text-xs uppercase tracking-label text-charcoal/60">
+          {navLinks.map((link) => (
+            <Link key={link.href} href={link.href} className="hover:text-black">
+              {link.label}
+            </Link>
+          ))}
+        </nav>
+        <form action={signOut}>
+          <button type="submit" className="text-xs uppercase tracking-label text-charcoal/60 focus-ring hover:text-black">
+            Déconnexion →
+          </button>
+        </form>
+      </header>
+      {children}
+    </div>
+  );
+}
