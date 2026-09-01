@@ -7,6 +7,7 @@ import { Eyebrow } from "@/components/ui/Eyebrow";
 
 const navLinks = [
   { href: "/manager", label: "Missions" },
+  { href: "/manager/carte", label: "Carte" },
   { href: "/manager/villes", label: "Villes" },
   { href: "/manager/operateurs", label: "Opérateurs" },
   { href: "/manager/clients", label: "Clients" },
