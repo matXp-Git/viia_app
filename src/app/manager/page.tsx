@@ -2,8 +2,8 @@ import { createClient } from "@/lib/supabase/server";
 import type { City, Client, Mission, Operator } from "@/lib/types";
 import { createMission, updateMissionAssignments } from "./actions";
 import { Eyebrow } from "@/components/ui/Eyebrow";
-import { MissionStatusBadge } from "@/components/ui/StatusBadge";
 import { CreateMissionForm } from "./CreateMissionForm";
+import { MissionHeader } from "./MissionHeader";
 import { Button } from "@/components/ui/Button";
 
 export default async function ManagerMissionsPage() {
@@ -45,15 +45,13 @@ export default async function ManagerMissionsPage() {
 
           return (
             <div key={mission.id} className="border border-line p-(--space-5)">
-              <div className="flex flex-wrap items-center justify-between gap-(--space-3)">
-                <div>
-                  <div className="text-sm font-bold text-black">{mission.reference ?? "—"}</div>
-                  <div className="mt-1 text-xs text-charcoal/60">
-                    {city?.name ?? "?"} · {client?.name ?? "Sans client"} · {mission.date}
-                  </div>
-                </div>
-                <MissionStatusBadge status={mission.status} />
-              </div>
+              <MissionHeader
+                mission={mission}
+                city={city}
+                client={client}
+                cities={(cities ?? []) as City[]}
+                clients={(clients ?? []) as Client[]}
+              />
 
               <form action={boundAction} className="mt-(--space-4) border-t border-line pt-(--space-4)">
                 <div className="text-2xs uppercase tracking-label text-charcoal/60">Opérateurs affectés</div>

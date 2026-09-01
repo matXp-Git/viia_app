@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import type { AppUser, City, Client, Operator } from "@/lib/types";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { CreateAppUserForm } from "./CreateAppUserForm";
+import { AppUserRow } from "./AppUserRow";
 
 export default async function UtilisateursPage() {
   const supabase = await createClient();
@@ -13,17 +14,14 @@ export default async function UtilisateursPage() {
     supabase.from("city").select("*").order("name"),
   ]);
 
-  const linkedOperatorIds = new Set((appUsers ?? []).map((u: AppUser) => u.operator_id).filter(Boolean));
-  const linkedClientIds = new Set((appUsers ?? []).map((u: AppUser) => u.client_id).filter(Boolean));
-  const linkedCityIds = new Set((appUsers ?? []).map((u: AppUser) => u.city_id).filter(Boolean));
+  const users = (appUsers ?? []) as AppUser[];
+  const allOperators = (operators ?? []) as Operator[];
+  const allClients = (clients ?? []) as Client[];
+  const allCities = (cities ?? []) as City[];
 
-  const operatorById = new Map(((operators ?? []) as Operator[]).map((o) => [o.id, o]));
-  const clientById = new Map(((clients ?? []) as Client[]).map((c) => [c.id, c]));
-  const cityById = new Map(((cities ?? []) as City[]).map((c) => [c.id, c]));
-
-  const availableOperators = ((operators ?? []) as Operator[]).filter((o) => !linkedOperatorIds.has(o.id));
-  const availableClients = ((clients ?? []) as Client[]).filter((c) => !linkedClientIds.has(c.id));
-  const availableCities = ((cities ?? []) as City[]).filter((c) => !linkedCityIds.has(c.id));
+  const operatorById = new Map(allOperators.map((o) => [o.id, o]));
+  const clientById = new Map(allClients.map((c) => [c.id, c]));
+  const cityById = new Map(allCities.map((c) => [c.id, c]));
 
   function scopeName(user: AppUser) {
     if (user.role === "operator" && user.operator_id) return operatorById.get(user.operator_id)?.name ?? "?";
@@ -32,13 +30,23 @@ export default async function UtilisateursPage() {
     return "—";
   }
 
+  // For the create form: entities not linked to anyone yet.
+  const linkedOperatorIds = new Set(users.map((u) => u.operator_id).filter(Boolean));
+  const linkedClientIds = new Set(users.map((u) => u.client_id).filter(Boolean));
+  const linkedCityIds = new Set(users.map((u) => u.city_id).filter(Boolean));
+
+  const availableOperators = allOperators.filter((o) => !linkedOperatorIds.has(o.id));
+  const availableClients = allClients.filter((c) => !linkedClientIds.has(c.id));
+  const availableCities = allCities.filter((c) => !linkedCityIds.has(c.id));
+
   return (
     <div>
       <Eyebrow>Utilisateurs</Eyebrow>
       <h1 className="mt-(--space-2) text-display-sm">Comptes ViiA Pick</h1>
       <p className="mt-(--space-2) max-w-[62ch] text-sm text-charcoal/85">
         Pour créer un compte : ajoutez-le d&apos;abord dans Supabase (Authentication → Add user), copiez son
-        identifiant (UUID), puis liez-le ici à un rôle et à une entité.
+        identifiant (UUID), puis liez-le ici à un rôle et à une entité. Une erreur de saisie (mauvais rôle,
+        mauvaise entité) se corrige avec « Modifier », sans recréer le compte.
       </p>
 
       <div className="mt-(--space-6)">
@@ -46,14 +54,18 @@ export default async function UtilisateursPage() {
       </div>
 
       <div className="mt-(--space-6) flex flex-col">
-        {((appUsers ?? []) as AppUser[]).map((user) => (
-          <div key={user.id} className="flex items-center justify-between gap-(--space-4) border-t border-line py-(--space-3) last:border-b">
-            <span className="text-xs text-charcoal/60">{user.id}</span>
-            <span className="text-sm text-black">{scopeName(user)}</span>
-            <span className="text-xs uppercase tracking-label text-charcoal/60">{user.role}</span>
-          </div>
+        {users.map((user) => (
+          <AppUserRow
+            key={user.id}
+            user={user}
+            scopeName={scopeName(user)}
+            // For editing, an entity may keep its own current link plus pick any unlinked one.
+            operators={allOperators.filter((o) => !linkedOperatorIds.has(o.id) || o.id === user.operator_id)}
+            clients={allClients.filter((c) => !linkedClientIds.has(c.id) || c.id === user.client_id)}
+            cities={allCities.filter((c) => !linkedCityIds.has(c.id) || c.id === user.city_id)}
+          />
         ))}
-        {(appUsers ?? []).length === 0 ? <p className="py-(--space-3) text-sm text-charcoal/60">Aucun compte lié.</p> : null}
+        {users.length === 0 ? <p className="py-(--space-3) text-sm text-charcoal/60">Aucun compte lié.</p> : null}
       </div>
     </div>
   );

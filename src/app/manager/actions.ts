@@ -13,7 +13,7 @@ async function requireManager() {
   return appUser;
 }
 
-export type FormState = { error?: string };
+export type FormState = { error?: string; success?: boolean };
 
 // ---- Villes ---------------------------------------------------------------
 
@@ -115,6 +115,36 @@ export async function createMission(_prevState: FormState, formData: FormData): 
   return {};
 }
 
+export async function updateMission(missionId: string, _prevState: FormState, formData: FormData): Promise<FormState> {
+  await requireManager();
+  const cityId = String(formData.get("city_id") ?? "");
+  const clientId = String(formData.get("client_id") ?? "") || null;
+  const date = String(formData.get("date") ?? "");
+
+  if (!cityId || !date) {
+    return { error: "Ville et date requises." };
+  }
+
+  const supabase = await createSupabaseClient();
+
+  const { data: mission } = await supabase.from("mission").select("status").eq("id", missionId).single();
+  if (mission?.status !== "planned") {
+    return { error: "Mission déjà démarrée — modification impossible." };
+  }
+
+  const { error } = await supabase
+    .from("mission")
+    .update({ city_id: cityId, client_id: clientId, date })
+    .eq("id", missionId);
+
+  if (error) {
+    return { error: "Erreur lors de la modification de la mission." };
+  }
+
+  revalidatePath("/manager");
+  return { success: true };
+}
+
 export async function setMissionAssignments(missionId: string, operatorIds: string[]) {
   await requireManager();
   const supabase = await createSupabaseClient();
@@ -185,4 +215,42 @@ export async function createAppUser(_prevState: FormState, formData: FormData): 
 
   revalidatePath("/manager/utilisateurs");
   return {};
+}
+
+export async function updateAppUser(userId: string, _prevState: FormState, formData: FormData): Promise<FormState> {
+  await requireManager();
+  const role = String(formData.get("role") ?? "") as Role;
+  const scopeId = String(formData.get("scope_id") ?? "") || null;
+
+  if (!role) {
+    return { error: "Rôle requis." };
+  }
+  if (role !== "manager" && !scopeId) {
+    return { error: "Ce rôle nécessite de sélectionner l'entité associée." };
+  }
+
+  const supabase = await createSupabaseClient();
+  const { error } = await supabase
+    .from("app_user")
+    .update({
+      role,
+      operator_id: role === "operator" ? scopeId : null,
+      client_id: role === "client" ? scopeId : null,
+      city_id: role === "city" ? scopeId : null,
+    })
+    .eq("id", userId);
+
+  if (error) {
+    return { error: "Erreur lors de la modification du profil." };
+  }
+
+  revalidatePath("/manager/utilisateurs");
+  return { success: true };
+}
+
+export async function deleteAppUser(userId: string) {
+  await requireManager();
+  const supabase = await createSupabaseClient();
+  await supabase.from("app_user").delete().eq("id", userId);
+  revalidatePath("/manager/utilisateurs");
 }
