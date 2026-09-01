@@ -34,6 +34,23 @@ export type MissionAssignment = {
   completed_at: string | null;
 };
 
+export type TrackSegment = {
+  id: string;
+  mission_id: string;
+  operator_id: string;
+  source: TrackSource;
+  created_at: string;
+};
+
+export type Weighing = {
+  id: string;
+  mission_id: string;
+  operator_id: string;
+  kilos_total: number;
+  kilos_recycled: number;
+  recorded_at: string;
+};
+
 export type AppUser = {
   id: string;
   role: Role;
