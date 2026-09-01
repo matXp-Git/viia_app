@@ -6,11 +6,19 @@ import {
   NavigationControl,
   Popup,
   LngLatBounds,
+  setWorkerUrl,
   type LngLatBoundsLike,
   type GeoJSONSource,
   type MapLayerMouseEvent,
 } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
+
+// Turbopack doesn't resolve maplibre-gl's built-in
+// `new Worker(new URL(..., import.meta.url))` loading correctly (the
+// request resolves to the page's HTML instead of the script, so the map
+// silently never renders any tiles). Point it at a static copy instead —
+// see scripts/copy-maplibre-worker.mjs.
+setWorkerUrl("/maplibre-gl-worker.mjs");
 
 export type TrackFeatureProps = {
   missionId: string;
