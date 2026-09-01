@@ -1,0 +1,136 @@
+/**
+ * Viia — Design tokens
+ * Source : src/styles/global.css + inventaire réel des composants du site viia.pro
+ * (grep sur font-size / padding / gap / border-radius / box-shadow / @media, août 2026)
+ *
+ * Légende :
+ *   [EXISTANT]  valeur littéralement présente dans le code du site vitrine
+ *   [DÉRIVÉ]    valeur du site, rangée dans une échelle nommée pour un usage dashboard
+ *   [PROPOSÉ]   n'existe pas encore sur le site — à valider avant usage (formulaires,
+ *               statuts, carte GPS : rien de tout ça n'existe dans le repo actuel)
+ */
+
+:root {
+
+  /* ===== COULEURS DE MARQUE — [EXISTANT] ===============================
+     Commentaire original dans le code source : "Couleurs de marque (provisoires)"
+     — considérées comme non figées par l'auteur du site lui-même. */
+
+  --color-accent: #EBED38;      /* seul accent du site entier : CTA, liens actifs, highlights, pastille "live" */
+  --color-charcoal: #444A4D;    /* texte principal sur fond clair, structure UI */
+  --color-black: #17181A;       /* fond des sections sombres, texte fort sur accent */
+  --color-white: #FFFFFF;
+  --color-offwhite: #F3F3F0;    /* fond par défaut (body) */
+  --color-line: rgba(68, 74, 77, 0.16);       /* séparateurs sur fond clair */
+  --color-line-dark: rgba(255, 255, 255, 0.14); /* séparateurs sur fond sombre */
+
+  /* ===== COULEUR DE TRACÉ GPS — QUESTION OUVERTE =========================
+     Il n'existe AUCUNE couleur de carte/trace dans le site actuel : le repo
+     ne contient ni carte ni GPS. --color-accent est la seule couleur de
+     marque distinctive ; le noir/charbon sont neutres, pas des identifiants.
+
+     Recommandation : commencer par réutiliser --color-accent tel quel pour
+     le tracé (cohérence de marque, un seul jaune à maintenir). Si le jaune
+     se noie sur un fond satellite/aérien (très probable — beaucoup de bâti
+     et de sol sont déjà jaune-brun), préférer un CONTOUR contrasté plutôt
+     qu'une 2e nuance de jaune : trait --color-accent avec un liseré
+     --color-black de 1-2px, plutôt que d'inventer un "jaune carte" distinct
+     qui romprait la cohérence de marque pour un problème de lisibilité qui
+     se résout autrement. */
+  --color-trace: var(--color-accent);          /* [PROPOSÉ] à valider sur fond de carte réel */
+  --color-trace-outline: var(--color-black);   /* [PROPOSÉ] liseré de contraste, si besoin */
+
+  /* ===== COULEURS SÉMANTIQUES — [PROPOSÉ] ================================
+     N'existent pas sur le site vitrine (aucun état d'erreur/succès nulle
+     part dans le code actuel). Choisies désaturées pour rester dans la
+     famille tonale charbon/crème plutôt que d'importer des couleurs vives
+     qui jureraient avec le reste. À valider avec la marque avant usage. */
+
+  --color-success: #4C7A5E;
+  --color-success-bg: #E9F1EC;
+  --color-warning: #B4862B;
+  --color-warning-bg: #F5EEDC;
+  --color-critical: #B24B3C;
+  --color-critical-bg: #F5E7E3;
+  --color-neutral: var(--color-charcoal);
+  --color-neutral-bg: var(--color-line);
+
+  /* ===== TYPOGRAPHIE ======================================================
+     Une seule famille sur tout le site (aucune police secondaire).
+     Aucune échelle nommée n'existe dans le code : chaque composant fixe sa
+     taille au cas par cas (souvent via clamp()). L'échelle ci-dessous est
+     une rationalisation [DÉRIVÉ] des valeurs réellement observées, utile
+     pour un dashboard dense en données où la cohérence compte plus que le
+     réglage fin par section. */
+
+  --font-mono: 'Space Mono', ui-monospace, SFMono-Regular, Menlo, monospace; /* [EXISTANT] — unique famille du site */
+
+  --text-2xs: 0.68rem;   /* [EXISTANT] plus petit data-label observé */
+  --text-xs: 0.72rem;    /* [EXISTANT] .data-label par défaut (global.css) */
+  --text-sm: 0.85rem;    /* [EXISTANT] .link-arrow, texte dense */
+  --text-base: 1rem;     /* [EXISTANT] corps de texte par défaut */
+  --text-md: 1.05rem;    /* [EXISTANT] paragraphes "lead" */
+  --text-lg: 1.2rem;     /* [EXISTANT] citations, valeurs de carte */
+  --text-xl: 1.6rem;     /* [EXISTANT] sous-titres ponctuels */
+  --text-display-sm: clamp(1.8rem, 3vw, 2.4rem); /* [EXISTANT] h2 de section — valeur la plus fréquente (x6) */
+  --text-display-lg: clamp(2.2rem, 4vw, 3.2rem); /* [DÉRIVÉ] h1 — moyenne des variantes hero observées */
+
+  --leading-tight: 1.15;   /* [EXISTANT] titres */
+  --leading-snug: 1.4;     /* [DÉRIVÉ] labels, badges */
+  --leading-normal: 1.6;   /* [EXISTANT] corps de texte (body, global.css) */
+
+  --weight-regular: 400;   /* [EXISTANT] — RÈGLE DE MAISON : tous les titres sont en 400, jamais 700 */
+  --weight-bold: 700;      /* [EXISTANT] réservé aux valeurs de données et emphases inline, jamais aux titres */
+
+  --tracking-label: 0.06em;  /* [EXISTANT] letter-spacing des data-labels */
+  --tracking-eyebrow: 0.08em; /* [EXISTANT] letter-spacing des eyebrows */
+
+  /* ===== ESPACEMENTS — [DÉRIVÉ] ==========================================
+     Aucun token d'espacement dans le code source (paddings/gaps posés en
+     dur par composant) mais la quasi-totalité des valeurs réelles sont des
+     multiples de 4px : échelle proposée ci-dessous, alignée sur l'usage. */
+
+  --space-1: 4px;
+  --space-2: 8px;    /* valeur de gap la plus fréquente du site (x13) */
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;   /* 2e valeur de gap la plus fréquente (x7) */
+  --space-7: 32px;
+  --space-8: 48px;
+  --space-9: 64px;
+  --space-10: 88px;
+
+  --gutter: clamp(20px, 4vw, 64px); /* [EXISTANT] padding horizontal des containers */
+  --container-max: 1280px;          /* [EXISTANT] */
+
+  /* ===== RAYONS — [EXISTANT] ==============================================
+     Système déjà minimal et cohérent sur le site : à reprendre tel quel. */
+
+  --radius-none: 0;      /* défaut — cartes, champs, badges : le site est volontairement anguleux */
+  --radius-sm: 4px;      /* inputs, textarea */
+  --radius-full: 999px;  /* boutons pilule, status-pill */
+  --radius-circle: 50%;  /* pastilles de statut, avatars */
+
+  /* ===== MOUVEMENT — [EXISTANT] ===========================================
+     Une seule vitesse/courbe utilisée partout sur le site. */
+
+  --duration-fast: 0.15s;
+  --ease-standard: ease;
+
+  /* ===== FOCUS — [PROPOSÉ] ================================================
+     Le site actuel n'a QUASIMENT aucun focus-ring visible : les champs du
+     formulaire de contact ne font que changer la couleur de bordure au
+     focus (pas d'anneau). Insuffisant pour un dashboard dense manipulé au
+     clavier — un anneau de focus explicite est proposé ici. */
+
+  --focus-ring: 0 0 0 3px color-mix(in srgb, var(--color-accent) 45%, transparent);
+
+  /* ===== BREAKPOINTS — [EXISTANT] =========================================
+     Pas de custom media queries CSS (limitation actuelle), mais valeurs de
+     référence à utiliser en JS/config si le dashboard passe par un
+     framework avec breakpoints configurables. */
+
+  --bp-tablet: 900px;  /* point de bascule principal (x10 occurrences) */
+  --bp-mobile: 600px;  /* bascule secondaire, mise en page très resserrée */
+}

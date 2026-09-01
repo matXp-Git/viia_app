@@ -1,0 +1,877 @@
+<title>Viia — Design System</title>
+<style>
+  :root {
+    --bg: #F3F3F0;
+    --surface: #FFFFFF;
+    --surface-2: #EBEBE7;
+    --text: #444A4D;
+    --text-strong: #17181A;
+    --text-dim: rgba(68,74,77,0.6);
+    --accent: #EBED38;
+    --accent-text: #17181A;
+    --line: rgba(68,74,77,0.16);
+    --code-bg: #FFFFFF;
+    --swatch-border: rgba(68,74,77,0.12);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #17181A;
+      --surface: #1D1E20;
+      --surface-2: #232427;
+      --text: rgba(255,255,255,0.78);
+      --text-strong: #FFFFFF;
+      --text-dim: rgba(255,255,255,0.5);
+      --accent: #EBED38;
+      --accent-text: #17181A;
+      --line: rgba(255,255,255,0.14);
+      --code-bg: #131415;
+      --swatch-border: rgba(255,255,255,0.12);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #17181A;
+    --surface: #1D1E20;
+    --surface-2: #232427;
+    --text: rgba(255,255,255,0.78);
+    --text-strong: #FFFFFF;
+    --text-dim: rgba(255,255,255,0.5);
+    --accent: #EBED38;
+    --accent-text: #17181A;
+    --line: rgba(255,255,255,0.14);
+    --code-bg: #131415;
+    --swatch-border: rgba(255,255,255,0.12);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Space Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 15px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: clamp(32px, 6vw, 72px) 20px 120px;
+  }
+
+  /* ---- Header ---- */
+
+  .masthead {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-bottom: 28px;
+    margin-bottom: 40px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .masthead__kicker {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-dim);
+  }
+
+  .masthead h1 {
+    margin: 0;
+    font-size: clamp(1.9rem, 5vw, 2.5rem);
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0.01em;
+    color: var(--text-strong);
+    text-wrap: balance;
+  }
+
+  .masthead p {
+    margin: 0;
+    max-width: 58ch;
+    color: var(--text);
+    opacity: 0.85;
+  }
+
+  .masthead__meta {
+    display: flex;
+    gap: 18px;
+    flex-wrap: wrap;
+    margin-top: 6px;
+    font-size: 0.75rem;
+    color: var(--text-dim);
+  }
+
+  /* ---- Sections ---- */
+
+  section.block {
+    padding-block: 40px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  section.block:last-of-type {
+    border-bottom: none;
+  }
+
+  .eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    color: var(--text-dim);
+    margin-bottom: 14px;
+  }
+
+  .eyebrow::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--line);
+  }
+
+  h2 {
+    margin: 0 0 6px;
+    font-size: clamp(1.3rem, 3vw, 1.6rem);
+    font-weight: 400;
+    text-transform: uppercase;
+    color: var(--text-strong);
+  }
+
+  .block > p.lede {
+    margin: 0 0 24px;
+    max-width: 62ch;
+    color: var(--text);
+    opacity: 0.85;
+  }
+
+  h3 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--text-strong);
+    margin: 28px 0 10px;
+  }
+
+  h3:first-child { margin-top: 0; }
+
+  p { margin: 10px 0; }
+
+  a { color: var(--text-strong); }
+
+  strong { color: var(--text-strong); font-weight: 700; }
+
+  code {
+    font-family: inherit;
+    background: var(--surface-2);
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 0.9em;
+  }
+
+  /* ---- Stack spec list ---- */
+
+  .spec {
+    display: flex;
+    flex-direction: column;
+    border-top: 1px solid var(--line);
+  }
+
+  .spec__row {
+    display: grid;
+    grid-template-columns: 160px 1fr;
+    gap: 16px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--line);
+    font-size: 0.9rem;
+  }
+
+  .spec__key {
+    color: var(--text-dim);
+    text-transform: uppercase;
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    padding-top: 2px;
+  }
+
+  .spec__val {
+    color: var(--text-strong);
+  }
+
+  .spec__val span.dim {
+    color: var(--text-dim);
+    font-size: 0.85em;
+  }
+
+  /* ---- Palette ---- */
+
+  .palette {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 14px;
+    margin-top: 8px;
+  }
+
+  .swatch {
+    border: 1px solid var(--swatch-border);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .swatch__fill {
+    height: 64px;
+  }
+
+  .swatch__meta {
+    padding: 8px 10px;
+    background: var(--surface);
+  }
+
+  .swatch__name {
+    font-size: 0.78rem;
+    color: var(--text-strong);
+    display: block;
+  }
+
+  .swatch__hex {
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    display: block;
+    margin-top: 2px;
+  }
+
+  /* ---- Type specimen ---- */
+
+  .specimen {
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 24px;
+    background: var(--surface);
+  }
+
+  .specimen__display {
+    font-size: clamp(1.6rem, 4vw, 2.1rem);
+    font-weight: 400;
+    text-transform: uppercase;
+    color: var(--text-strong);
+    margin: 0 0 14px;
+  }
+
+  .specimen__body {
+    max-width: 56ch;
+    color: var(--text);
+    opacity: 0.85;
+    margin: 0 0 14px;
+  }
+
+  .specimen__weights {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    padding-top: 14px;
+    border-top: 1px solid var(--line);
+  }
+
+  .specimen__weights b { color: var(--text-strong); font-weight: 700; }
+  .specimen__weights i { color: var(--text-strong); font-style: italic; }
+
+  /* ---- Component gallery ---- */
+
+  .demo-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 20px;
+    padding: 18px 0;
+    border-top: 1px solid var(--line);
+  }
+
+  .demo-row:last-child { border-bottom: 1px solid var(--line); }
+
+  .demo-row__label {
+    width: 110px;
+    flex-shrink: 0;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-dim);
+  }
+
+  .demo-row__content {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .d-eyebrow {
+    font-size: 0.78rem;
+    letter-spacing: 0.06em;
+    color: var(--text-dim);
+  }
+
+  .d-link {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    border-bottom: 1px solid currentColor;
+    color: var(--text-strong);
+    padding-bottom: 2px;
+  }
+
+  .d-label {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-dim);
+  }
+
+  .d-btn {
+    display: inline-block;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    padding: 10px 18px;
+    border-radius: 999px;
+  }
+
+  .d-btn--accent {
+    background: var(--accent);
+    color: var(--accent-text);
+  }
+
+  .d-btn--ghost {
+    border: 1px solid var(--text-strong);
+    color: var(--text-strong);
+  }
+
+  .d-card-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--line);
+    width: 100%;
+    max-width: 420px;
+    border: 1px solid var(--line);
+  }
+
+  .d-card {
+    background: var(--surface);
+    padding: 14px;
+  }
+
+  .d-card__label { font-size: 0.68rem; color: var(--text-dim); text-transform: uppercase; }
+  .d-card__value { font-size: 0.95rem; color: var(--text-strong); margin-top: 6px; font-weight: 700; }
+
+  .surface-pair {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    overflow: hidden;
+    width: 100%;
+  }
+
+  .surface-pair > div {
+    padding: 18px;
+    font-size: 0.85rem;
+  }
+
+  .surface-pair .light-demo {
+    background: #F3F3F0;
+    color: #444A4D;
+  }
+
+  .surface-pair .dark-demo {
+    background: #17181A;
+    color: rgba(255,255,255,0.85);
+  }
+
+  .surface-pair .demo-tag {
+    display: inline-block;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    opacity: 0.55;
+    margin-bottom: 8px;
+  }
+
+  /* ---- Recommendation cards ---- */
+
+  .verdicts {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .verdict {
+    background: var(--surface);
+    padding: 16px 18px;
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    gap: 16px;
+  }
+
+  .verdict__tag {
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 3px 9px;
+    border-radius: 999px;
+    height: fit-content;
+    white-space: nowrap;
+  }
+
+  .verdict__tag--keep { background: var(--accent); color: var(--accent-text); }
+  .verdict__tag--adapt { background: var(--surface-2); color: var(--text-strong); border: 1px solid var(--line); }
+  .verdict__tag--new { background: transparent; color: var(--text-dim); border: 1px dashed var(--line); }
+
+  .verdict__body b { color: var(--text-strong); }
+  .verdict__body { font-size: 0.88rem; }
+
+  /* ---- Callout ---- */
+
+  .callout {
+    border: 1px dashed var(--line);
+    border-radius: 4px;
+    padding: 16px 18px;
+    margin-top: 16px;
+    font-size: 0.85rem;
+  }
+
+  .callout__tag {
+    display: inline-block;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-dim);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 2px 9px;
+    margin-bottom: 8px;
+  }
+
+  /* ---- Form fields ---- */
+
+  .field-demo {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+    max-width: 280px;
+  }
+
+  .field-demo label {
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-dim);
+  }
+
+  .field-demo input,
+  .field-demo select {
+    font-family: inherit;
+    font-size: 0.9rem;
+    color: var(--text-strong);
+    background: transparent;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 10px 12px;
+  }
+
+  .field-demo input:focus-visible,
+  .field-demo select:focus-visible {
+    outline: none;
+    border-color: var(--text-strong);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 45%, transparent);
+  }
+
+  .field-demo.is-error input {
+    border-color: #B24B3C;
+  }
+
+  .field-demo.is-error .field-msg {
+    color: #B24B3C;
+    font-size: 0.75rem;
+  }
+
+  .field-demo.is-disabled input {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  .field-demo.is-disabled label {
+    opacity: 0.45;
+  }
+
+  /* ---- Badges ---- */
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px 10px;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    width: fit-content;
+    border-radius: 0;
+  }
+
+  .badge--planned { background: transparent; border: 1px solid var(--line); color: var(--text-dim); }
+  .badge--in-progress { background: color-mix(in srgb, var(--accent) 70%, transparent); color: var(--accent-text); }
+  .badge--completed { background: #E9F1EC; color: #4C7A5E; }
+  .badge--active { background: #E9F1EC; color: #4C7A5E; }
+  .badge--inactive { background: transparent; border: 1px solid var(--line); color: var(--text-dim); opacity: 0.7; }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .badge--completed,
+    :root:not([data-theme="light"]) .badge--active { background: rgba(76,122,94,0.25); color: #8FC7A6; }
+  }
+  :root[data-theme="dark"] .badge--completed,
+  :root[data-theme="dark"] .badge--active { background: rgba(76,122,94,0.25); color: #8FC7A6; }
+
+  /* ---- List rows ---- */
+
+  .list-row {
+    display: grid;
+    grid-template-columns: 100px 1fr 120px 90px;
+    gap: 14px;
+    align-items: center;
+    padding: 12px 0;
+    border-top: 1px solid var(--line);
+    font-size: 0.85rem;
+  }
+
+  .list-row:last-child { border-bottom: 1px solid var(--line); }
+
+  .list-row__title { color: var(--text-strong); }
+  .list-row__meta { color: var(--text-dim); font-size: 0.78rem; }
+  .list-row__value { text-align: right; font-weight: 700; color: var(--text-strong); }
+
+  @media (max-width: 560px) {
+    .list-row { grid-template-columns: 1fr; gap: 4px; }
+    .list-row__value { text-align: left; }
+  }
+
+  footer.page-footer {
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  @media (max-width: 560px) {
+    .spec__row { grid-template-columns: 1fr; }
+    .verdict { grid-template-columns: 1fr; }
+    .surface-pair { grid-template-columns: 1fr; }
+    .d-card-grid { grid-template-columns: 1fr; max-width: 100%; }
+  }
+</style>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+
+<div class="page">
+
+  <header class="masthead">
+    <p class="masthead__kicker">Référence technique — viia.pro</p>
+    <h1>Design system &amp; stack</h1>
+    <p>Ce que le site vitrine Viia Pick utilise aujourd'hui — palette, typographie, composants et infrastructure — à reprendre ou adapter pour le futur dashboard client.</p>
+    <div class="masthead__meta">
+      <span>Repo — matXp-Git/Viaa</span>
+      <span>Prod — viia.pro</span>
+      <span>Maj — août 2026</span>
+    </div>
+  </header>
+
+  <section class="block">
+    <div class="eyebrow">01 — Stack actuelle</div>
+    <h2>Ce qui fait tourner le site</h2>
+    <p class="lede">Un site statique généré à la build, avec deux routes API légères pour le formulaire de contact et le numéro de téléphone masqué.</p>
+
+    <div class="spec">
+      <div class="spec__row">
+        <div class="spec__key">Framework</div>
+        <div class="spec__val">Astro 7.2 <span class="dim">— TypeScript, Content Layer API pour l'éditorial</span></div>
+      </div>
+      <div class="spec__row">
+        <div class="spec__key">Rendu</div>
+        <div class="spec__val">Statique par défaut <span class="dim">(output: 'static')</span>, hybride sur 2 routes <span class="dim">(prerender = false)</span> pour /api/contact et /api/phone</div>
+      </div>
+      <div class="spec__row">
+        <div class="spec__key">Hébergement</div>
+        <div class="spec__val">Vercel <span class="dim">— déploiement auto sur push vers main</span></div>
+      </div>
+      <div class="spec__row">
+        <div class="spec__key">Domaine</div>
+        <div class="spec__val">viia.pro <span class="dim">via Vercel DNS</span></div>
+      </div>
+      <div class="spec__row">
+        <div class="spec__key">Analytics</div>
+        <div class="spec__val">Vercel Web Analytics <span class="dim">— choisi pour éviter le bandeau cookies obligatoire de GA</span></div>
+      </div>
+      <div class="spec__row">
+        <div class="spec__key">Email</div>
+        <div class="spec__val">Resend <span class="dim">— domaine sandbox, à vérifier avant montée en charge</span></div>
+      </div>
+      <div class="spec__row">
+        <div class="spec__key">Anti-spam</div>
+        <div class="spec__val">Cloudflare Turnstile + honeypot</div>
+      </div>
+      <div class="spec__row">
+        <div class="spec__key">SEO</div>
+        <div class="spec__val">@astrojs/sitemap, robots.txt, Search Console <span class="dim">(propriété domaine)</span></div>
+      </div>
+      <div class="spec__row">
+        <div class="spec__key">Ce qui manque</div>
+        <div class="spec__val">Aucune base de données, aucune authentification, aucun temps réel</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="eyebrow">02 — Palette</div>
+    <h2>Six couleurs, deux terrains</h2>
+    <p class="lede">Le site alterne des sections claires (fond crème) et sombres (charbon/noir) — le jaune-vert reste le seul accent dans les deux cas.</p>
+
+    <div class="palette">
+      <div class="swatch">
+        <div class="swatch__fill" style="background:#EBED38"></div>
+        <div class="swatch__meta"><span class="swatch__name">Accent</span><span class="swatch__hex">#EBED38</span></div>
+      </div>
+      <div class="swatch">
+        <div class="swatch__fill" style="background:#444A4D"></div>
+        <div class="swatch__meta"><span class="swatch__name">Charbon</span><span class="swatch__hex">#444A4D</span></div>
+      </div>
+      <div class="swatch">
+        <div class="swatch__fill" style="background:#17181A"></div>
+        <div class="swatch__meta"><span class="swatch__name">Noir</span><span class="swatch__hex">#17181A</span></div>
+      </div>
+      <div class="swatch">
+        <div class="swatch__fill" style="background:#F3F3F0; border-bottom:1px solid rgba(68,74,77,0.12)"></div>
+        <div class="swatch__meta"><span class="swatch__name">Crème</span><span class="swatch__hex">#F3F3F0</span></div>
+      </div>
+      <div class="swatch">
+        <div class="swatch__fill" style="background:#FFFFFF; border-bottom:1px solid rgba(68,74,77,0.12)"></div>
+        <div class="swatch__meta"><span class="swatch__name">Blanc</span><span class="swatch__hex">#FFFFFF</span></div>
+      </div>
+      <div class="swatch">
+        <div class="swatch__fill" style="background:repeating-linear-gradient(45deg, #444A4D, #444A4D 6px, transparent 6px, transparent 12px), #F3F3F0"></div>
+        <div class="swatch__meta"><span class="swatch__name">Ligne</span><span class="swatch__hex">rgba(68,74,77,.16)</span></div>
+      </div>
+    </div>
+
+    <h3>Les deux terrains</h3>
+    <div class="surface-pair">
+      <div class="light-demo">
+        <span class="demo-tag">Section claire</span>
+        Texte en charbon sur fond crème — le mode par défaut, utilisé sur la majorité des sections.
+      </div>
+      <div class="dark-demo">
+        <span class="demo-tag">Section sombre</span>
+        Texte blanc à 78% d'opacité sur fond noir — réservé aux sections à fort impact (visuels, citations).
+      </div>
+    </div>
+
+    <div class="callout">
+      <span class="callout__tag">Question ouverte</span>
+      <p style="margin:0">Le "jaune du tracé GPS" n'existe pas aujourd'hui — il n'y a ni carte ni GPS dans le repo actuel, et <code>#EBED38</code> est la seule couleur de marque du site entier. Recommandation : réutiliser cet accent tel quel pour le tracé plutôt que d'introduire un second jaune. S'il se noie sur un fond satellite (probable — beaucoup de bâti est déjà jaune-brun), corriger avec un <strong>liseré de contraste</strong> (accent + contour noir 1-2px) plutôt qu'une nouvelle teinte.</p>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="eyebrow">03 — Typographie</div>
+    <h2>Une seule famille, deux registres</h2>
+    <p class="lede">Space Mono partout — aucune police secondaire. Le ton "données opérationnelles" vient de la graisse et de la casse, pas d'un mélange de polices.</p>
+
+    <div class="specimen">
+      <p class="specimen__display">Les zones délaissées ne le sont plus.</p>
+      <p class="specimen__body">Corps de texte en régulier, ~85% d'opacité. Les titres sont toujours en graisse 400 (jamais 700) et en majuscules — c'est la règle de maison, y compris pour les gros titres.</p>
+      <div class="specimen__weights">
+        <span><b>700 — Bold</b></span>
+        <span><i>400 italic</i></span>
+        <span>0.72rem uppercase — labels</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="eyebrow">04 — Composants clés</div>
+    <h2>Les briques réutilisables</h2>
+    <p class="lede">Les motifs qui reviennent sur tout le site, rendus ici avec leur vrai CSS.</p>
+
+    <div class="demo-row">
+      <div class="demo-row__label">Eyebrow</div>
+      <div class="demo-row__content"><span class="d-eyebrow">04 ————</span></div>
+    </div>
+    <div class="demo-row">
+      <div class="demo-row__label">Lien flèche</div>
+      <div class="demo-row__content"><span class="d-link">Vous êtes une collectivité →</span></div>
+    </div>
+    <div class="demo-row">
+      <div class="demo-row__label">Data label</div>
+      <div class="demo-row__content"><span class="d-label">Zone / Urbaine · Périurbaine</span></div>
+    </div>
+    <div class="demo-row">
+      <div class="demo-row__label">Boutons</div>
+      <div class="demo-row__content">
+        <span class="d-btn d-btn--accent">Contact →</span>
+        <span class="d-btn d-btn--ghost">Acteurs privés →</span>
+        <span class="d-btn d-btn--accent" style="opacity:0.4; cursor:not-allowed;">Envoi... ⏳</span>
+        <span class="d-btn d-btn--ghost" style="opacity:0.35; cursor:not-allowed;">Désactivé</span>
+      </div>
+    </div>
+    <p style="font-size:0.78rem; color:var(--text-dim); margin-top:-6px;">Le site n'a pas de système d'icônes (flèches "→" en glyphe mono uniquement) — le disabled et l'icône ci-dessus sont proposés, pas repris du code.</p>
+    <div class="demo-row">
+      <div class="demo-row__label">Grille carte</div>
+      <div class="demo-row__content">
+        <div class="d-card-grid">
+          <div class="d-card"><div class="d-card__label">Zone</div><div class="d-card__value">Secteur 03</div></div>
+          <div class="d-card"><div class="d-card__label">Début</div><div class="d-card__value">05:42</div></div>
+          <div class="d-card"><div class="d-card__label">Collecté</div><div class="d-card__value">72,4 kg</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="eyebrow">05 — Champs de formulaire</div>
+    <h2>Absents du site vitrine</h2>
+    <p class="lede">Seul le formulaire de contact existe aujourd'hui (texte, email, select) — sans état d'erreur ni désactivé. Base réelle du site + états proposés pour les formulaires manager (ville/opérateur/mission) et la saisie de pesée.</p>
+
+    <div class="demo-row">
+      <div class="demo-row__label">Texte — normal</div>
+      <div class="demo-row__content">
+        <div class="field-demo">
+          <label>Nom de la mission</label>
+          <input type="text" value="Secteur 03 — matinée" />
+        </div>
+      </div>
+    </div>
+    <div class="demo-row">
+      <div class="demo-row__label">Texte — focus</div>
+      <div class="demo-row__content">
+        <div class="field-demo">
+          <label>Poids collecté (kg)</label>
+          <input type="text" value="72,4" style="border-color:var(--text-strong); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 45%, transparent);" />
+        </div>
+      </div>
+    </div>
+    <div class="demo-row">
+      <div class="demo-row__label">Texte — erreur</div>
+      <div class="demo-row__content">
+        <div class="field-demo is-error">
+          <label>Email opérateur</label>
+          <input type="text" value="j.dupont@" />
+          <span class="field-msg">Adresse email incomplète</span>
+        </div>
+      </div>
+    </div>
+    <div class="demo-row">
+      <div class="demo-row__label">Select</div>
+      <div class="demo-row__content">
+        <div class="field-demo">
+          <label>Ville</label>
+          <select><option>Lambersart</option></select>
+        </div>
+      </div>
+    </div>
+    <div class="demo-row">
+      <div class="demo-row__label">Désactivé</div>
+      <div class="demo-row__content">
+        <div class="field-demo is-disabled">
+          <label>ID mission</label>
+          <input type="text" value="MSN-0348" disabled />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="eyebrow">06 — Badges de statut</div>
+    <h2>Extension du status-pill existant</h2>
+    <p class="lede">Le site a déjà un composant <code>.status-pill</code> (utilisé pour Publié / Brouillon sur la liste éditoriale) — base réelle étendue ici aux statuts mission et opérateur.</p>
+
+    <div class="demo-row">
+      <div class="demo-row__label">Mission</div>
+      <div class="demo-row__content">
+        <span class="badge badge--planned">Planifiée</span>
+        <span class="badge badge--in-progress">En cours</span>
+        <span class="badge badge--completed">Terminée</span>
+      </div>
+    </div>
+    <div class="demo-row">
+      <div class="demo-row__label">Opérateur</div>
+      <div class="demo-row__content">
+        <span class="badge badge--active">Actif</span>
+        <span class="badge badge--inactive">Inactif</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="eyebrow">07 — Lignes de liste</div>
+    <h2>Missions &amp; opérateurs</h2>
+    <p class="lede">Basé sur le pattern réel de la page d'aperçu éditorial (ligne = pastille + titre + métadonnées) — étendu ici à une colonne de valeur chiffrée.</p>
+
+    <div class="list-row" style="border-top:none; padding-top:0;">
+      <span class="badge badge--in-progress">En cours</span>
+      <span class="list-row__title">Secteur 03 — matinée</span>
+      <span class="list-row__meta">J. Dupont · 05:42</span>
+      <span class="list-row__value">72,4 kg</span>
+    </div>
+    <div class="list-row">
+      <span class="badge badge--completed">Terminée</span>
+      <span class="list-row__title">Secteur 07 — soirée</span>
+      <span class="list-row__meta">M. Lefèvre · 18:10</span>
+      <span class="list-row__value">54,1 kg</span>
+    </div>
+    <div class="list-row">
+      <span class="badge badge--planned">Planifiée</span>
+      <span class="list-row__title">Secteur 01 — nuit</span>
+      <span class="list-row__meta">Non assignée</span>
+      <span class="list-row__value">—</span>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="eyebrow">08 — Pour le dashboard</div>
+    <h2>Ce qui sert, ce qui manque</h2>
+    <p class="lede">Le site vitrine n'a ni base de données, ni authentification, ni temps réel — normal, ce n'est pas son rôle. Voici ce qui se transporte tel quel et ce qui reste à choisir dans la nouvelle session.</p>
+
+    <div class="verdicts">
+      <div class="verdict">
+        <span class="verdict__tag verdict__tag--keep">À reprendre</span>
+        <div class="verdict__body">La palette, Space Mono, les <b>data-labels</b> et la grille "carte de rapport" (déjà utilisée pour le rapport d'intervention sur la home) — le style colle naturellement à un dashboard d'opérations.</div>
+      </div>
+      <div class="verdict">
+        <span class="verdict__tag verdict__tag--adapt">À adapter</span>
+        <div class="verdict__body">Astro peut servir de coquille (pages statiques, marketing du dashboard) mais une app authentifiée avec carte GPS temps réel voudra des îlots interactifs <b>React/Vue</b> ou un framework plus orienté app <b>(Next.js, SvelteKit)</b> pour la partie connectée — à trancher selon la charge temps réel voulue.</div>
+      </div>
+      <div class="verdict">
+        <span class="verdict__tag verdict__tag--new">Net nouveau</span>
+        <div class="verdict__body">Authentification client, base de données <b>(positions GPS, opérations, historique)</b>, ingestion temps réel des positions opérateurs, librairie de cartographie <b>(Mapbox / MapLibre / Leaflet)</b> — rien de tout ça n'existe dans le repo actuel.</div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="page-footer">Viia Pick — document de passation, session suivante</footer>
+
+</div>

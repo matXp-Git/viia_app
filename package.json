@@ -1,0 +1,31 @@
+{
+  "name": "viia-pick",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@supabase/ssr": "^0.12.5",
+    "@supabase/supabase-js": "^2.112.4",
+    "maplibre-gl": "^6.6.0",
+    "next": "^16.3.4",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.3",
+    "@types/node": "^22.10.7",
+    "@types/react": "^19.0.8",
+    "@types/react-dom": "^19.0.3",
+    "eslint": "^9.19.0",
+    "eslint-config-next": "^16.3.4",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^6.0.3"
+  }
+}

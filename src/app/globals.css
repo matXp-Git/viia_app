@@ -1,0 +1,101 @@
+@import "tailwindcss";
+
+/*
+ * Design tokens: the single source of truth lives in References/, the
+ * hand-off file from the design system. Nothing below should duplicate a
+ * literal color/size value — everything is either that file directly, or a
+ * Tailwind theme alias pointing back at one of its variables.
+ */
+@import "../../References/viia-design-tokens.css";
+
+@theme inline {
+  /* ---- colors: exposes bg-accent, text-charcoal, border-line, etc. ---- */
+  --color-accent: var(--color-accent);
+  --color-accent-text: var(--color-black);
+  --color-charcoal: var(--color-charcoal);
+  --color-black: var(--color-black);
+  --color-white: var(--color-white);
+  --color-offwhite: var(--color-offwhite);
+  --color-line: var(--color-line);
+  --color-line-dark: var(--color-line-dark);
+  --color-trace: var(--color-trace);
+  --color-trace-outline: var(--color-trace-outline);
+  --color-success: var(--color-success);
+  --color-success-bg: var(--color-success-bg);
+  --color-warning: var(--color-warning);
+  --color-warning-bg: var(--color-warning-bg);
+  --color-critical: var(--color-critical);
+  --color-critical-bg: var(--color-critical-bg);
+  --color-neutral: var(--color-neutral);
+  --color-neutral-bg: var(--color-neutral-bg);
+
+  /* ---- typography ---- */
+  --font-mono: var(--font-mono);
+  --text-2xs: var(--text-2xs);
+  --text-xs: var(--text-xs);
+  --text-sm: var(--text-sm);
+  --text-base: var(--text-base);
+  --text-md: var(--text-md);
+  --text-lg: var(--text-lg);
+  --text-xl: var(--text-xl);
+  --text-display-sm: var(--text-display-sm);
+  --text-display-lg: var(--text-display-lg);
+
+  --leading-tight: var(--leading-tight);
+  --leading-snug: var(--leading-snug);
+  --leading-normal: var(--leading-normal);
+
+  --font-weight-regular: var(--weight-regular);
+  --font-weight-bold: var(--weight-bold);
+
+  --tracking-label: var(--tracking-label);
+  --tracking-eyebrow: var(--tracking-eyebrow);
+
+  /* ---- radius ---- */
+  --radius-none: var(--radius-none);
+  --radius-sm: var(--radius-sm);
+  --radius-full: var(--radius-full);
+  --radius-circle: var(--radius-circle);
+
+  /* ---- breakpoints: enables mobile: / tablet: variants -----------------
+     @media conditions can't reference a CSS custom property (media queries
+     are resolved before the cascade applies var()), so these two values
+     must be literal — they are copies of --bp-mobile/--bp-tablet from
+     References/viia-design-tokens.css, keep them in sync if that changes. */
+  --breakpoint-mobile: 600px;
+  --breakpoint-tablet: 900px;
+}
+
+body {
+  background: var(--color-offwhite);
+  color: var(--color-charcoal);
+  font-family: var(--font-mono);
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+  -webkit-font-smoothing: antialiased;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Titles are always weight 400 and uppercase — house rule, never override
+   per-component. See References/viia-design-system.html §03. */
+h1,
+h2,
+h3 {
+  font-weight: var(--weight-regular);
+  text-transform: uppercase;
+  color: var(--color-black);
+  margin: 0;
+}
+
+a {
+  color: var(--color-black);
+}
+
+.focus-ring:focus-visible {
+  outline: none;
+  border-color: var(--color-black);
+  box-shadow: var(--focus-ring);
+}

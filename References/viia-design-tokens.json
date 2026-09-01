@@ -1,0 +1,92 @@
+{
+  "$schema": "viia-design-tokens",
+  "source": "src/styles/global.css + inventaire réel des composants (viia.pro, août 2026)",
+  "legend": {
+    "existing": "valeur littéralement présente dans le code du site vitrine",
+    "derived": "valeur du site, rangée dans une échelle nommée pour usage dashboard",
+    "proposed": "n'existe pas encore — aucun form/statut/carte dans le repo actuel, à valider"
+  },
+  "color": {
+    "brand": {
+      "accent": { "value": "#EBED38", "status": "existing", "usage": "seul accent du site : CTA, liens actifs, highlights, pastille live" },
+      "charcoal": { "value": "#444A4D", "status": "existing", "usage": "texte principal sur fond clair" },
+      "black": { "value": "#17181A", "status": "existing", "usage": "fond des sections sombres" },
+      "white": { "value": "#FFFFFF", "status": "existing" },
+      "offwhite": { "value": "#F3F3F0", "status": "existing", "usage": "fond par défaut" }
+    },
+    "line": {
+      "onLight": { "value": "rgba(68,74,77,0.16)", "status": "existing" },
+      "onDark": { "value": "rgba(255,255,255,0.14)", "status": "existing" }
+    },
+    "trace": {
+      "primary": { "value": "#EBED38", "status": "proposed", "note": "réutilise l'accent — aucune couleur de carte n'existe aujourd'hui, à valider sur fond satellite réel avant de figer" },
+      "outline": { "value": "#17181A", "status": "proposed", "note": "liseré de contraste si le jaune seul se noie sur la carte, préférable à une 2e nuance de jaune" }
+    },
+    "semantic": {
+      "success": { "value": "#4C7A5E", "bg": "#E9F1EC", "status": "proposed" },
+      "warning": { "value": "#B4862B", "bg": "#F5EEDC", "status": "proposed" },
+      "critical": { "value": "#B24B3C", "bg": "#F5E7E3", "status": "proposed" },
+      "neutral": { "value": "#444A4D", "bg": "rgba(68,74,77,0.16)", "status": "proposed" }
+    }
+  },
+  "typography": {
+    "fontFamily": {
+      "mono": { "value": "'Space Mono', ui-monospace, SFMono-Regular, Menlo, monospace", "status": "existing", "note": "unique famille sur tout le site, aucune police secondaire" }
+    },
+    "fontSize": {
+      "2xs": { "value": "0.68rem", "status": "existing" },
+      "xs": { "value": "0.72rem", "status": "existing", "note": "data-label par défaut" },
+      "sm": { "value": "0.85rem", "status": "existing", "note": "link-arrow, texte dense" },
+      "base": { "value": "1rem", "status": "existing", "note": "corps de texte par défaut" },
+      "md": { "value": "1.05rem", "status": "existing", "note": "paragraphes lead" },
+      "lg": { "value": "1.2rem", "status": "existing", "note": "citations, valeurs de carte" },
+      "xl": { "value": "1.6rem", "status": "existing" },
+      "displaySm": { "value": "clamp(1.8rem, 3vw, 2.4rem)", "status": "existing", "note": "h2 de section — valeur la plus fréquente (x6)" },
+      "displayLg": { "value": "clamp(2.2rem, 4vw, 3.2rem)", "status": "derived", "note": "h1 — moyenne des variantes hero observées" }
+    },
+    "lineHeight": {
+      "tight": { "value": 1.15, "status": "existing" },
+      "snug": { "value": 1.4, "status": "derived" },
+      "normal": { "value": 1.6, "status": "existing" }
+    },
+    "fontWeight": {
+      "regular": { "value": 400, "status": "existing", "note": "RÈGLE DE MAISON : tous les titres sont en 400, jamais 700" },
+      "bold": { "value": 700, "status": "existing", "note": "réservé aux valeurs de données et emphases inline" }
+    },
+    "letterSpacing": {
+      "label": { "value": "0.06em", "status": "existing" },
+      "eyebrow": { "value": "0.08em", "status": "existing" }
+    }
+  },
+  "space": {
+    "1": { "value": "4px", "status": "derived" },
+    "2": { "value": "8px", "status": "existing", "note": "gap le plus fréquent du site (x13)" },
+    "3": { "value": "12px", "status": "existing" },
+    "4": { "value": "16px", "status": "existing" },
+    "5": { "value": "20px", "status": "existing" },
+    "6": { "value": "24px", "status": "existing", "note": "2e gap le plus fréquent (x7)" },
+    "7": { "value": "32px", "status": "existing" },
+    "8": { "value": "48px", "status": "existing" },
+    "9": { "value": "64px", "status": "existing" },
+    "10": { "value": "88px", "status": "existing" },
+    "gutter": { "value": "clamp(20px, 4vw, 64px)", "status": "existing" },
+    "containerMax": { "value": "1280px", "status": "existing" }
+  },
+  "radius": {
+    "none": { "value": "0", "status": "existing", "note": "défaut — le site est volontairement anguleux" },
+    "sm": { "value": "4px", "status": "existing", "note": "inputs, textarea" },
+    "full": { "value": "999px", "status": "existing", "note": "boutons pilule, status-pill" },
+    "circle": { "value": "50%", "status": "existing", "note": "pastilles de statut, avatars" }
+  },
+  "motion": {
+    "durationFast": { "value": "0.15s", "status": "existing" },
+    "easeStandard": { "value": "ease", "status": "existing" }
+  },
+  "focus": {
+    "ring": { "value": "0 0 0 3px color-mix(in srgb, #EBED38 45%, transparent)", "status": "proposed", "note": "le site actuel n'a quasi aucun focus-ring visible (juste un changement de bordure) — insuffisant pour un dashboard clavier" }
+  },
+  "breakpoint": {
+    "tablet": { "value": "900px", "status": "existing", "note": "bascule principale (x10 occurrences)" },
+    "mobile": { "value": "600px", "status": "existing" }
+  }
+}
