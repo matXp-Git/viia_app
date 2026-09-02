@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import Link from "next/link";
 import type { City, Client, Mission } from "@/lib/types";
 import { updateMission, completeMission } from "./actions";
 import { Button } from "@/components/ui/Button";
@@ -47,7 +48,9 @@ export function MissionHeader({ mission, city, client, cities, clients }: Props)
     return (
       <div className="flex flex-wrap items-center justify-between gap-(--space-3)">
         <div>
-          <div className="text-sm font-bold text-black">{mission.reference ?? "—"}</div>
+          <Link href={`/manager/missions/${mission.id}`} className="text-sm font-bold text-black underline decoration-line underline-offset-2 hover:decoration-black">
+            {mission.reference ?? "—"}
+          </Link>
           <div className="mt-1 text-xs text-charcoal/60">
             {city?.name ?? "?"} · {client?.name ?? "Sans client"} · {mission.date}
           </div>

@@ -24,9 +24,9 @@ const geolocationSupported = typeof navigator !== "undefined" && "geolocation" i
 
 function LivePulse() {
   return (
-    <span className="relative flex h-3 w-3">
+    <span className="relative flex h-6 w-6">
       <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-75" />
-      <span className="relative inline-flex h-3 w-3 rounded-full bg-accent" />
+      <span className="relative inline-flex h-6 w-6 rounded-full bg-accent" />
     </span>
   );
 }
@@ -154,7 +154,7 @@ export function MissionRunner({ missionId, reference, cityName, clientName, date
     <main className="mx-auto flex min-h-screen max-w-[480px] flex-col px-(--gutter) py-(--space-9)">
       <div className="flex flex-col items-center text-center">
         <div className="flex items-center gap-(--space-3)">
-          {tracking ? <LivePulse /> : <span className="h-3 w-3 rounded-full border border-line" />}
+          {tracking ? <LivePulse /> : <span className="h-6 w-6 rounded-full border-2 border-line" />}
           <span className="text-xs uppercase tracking-eyebrow text-charcoal/60">
             {tracking ? "Mission en cours" : "Suivi en pause"}
           </span>
