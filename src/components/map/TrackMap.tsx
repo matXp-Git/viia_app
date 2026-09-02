@@ -70,6 +70,54 @@ function resolveToken(name: string): string {
   return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 }
 
+// Turns a token's hex color into a MapLibre-safe rgba() string at a given
+// alpha. Deliberately not using CSS color-mix() + getComputedStyle():
+// depending on the browser, the computed value can come back in the
+// CSS Color 4 `color(srgb ...)` syntax, which MapLibre's style validator
+// rejects outright (silently, no thrown error — the paint property is just
+// never applied).
+function tokenToRgba(name: string, alpha: number): string {
+  let hex = resolveToken(name).replace("#", "");
+  if (hex.length === 3) {
+    hex = hex
+      .split("")
+      .map((c) => c + c)
+      .join("");
+  }
+  const r = parseInt(hex.slice(0, 2), 16);
+  const g = parseInt(hex.slice(2, 4), 16);
+  const b = parseInt(hex.slice(4, 6), 16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+// The OpenFreeMap "dark" style draws streets nearly the same color as the
+// background (e.g. highway_minor #181818 on a rgb(12,12,12) map) — barely
+// legible. Brighten just the road/label layers, derived from the white
+// token rather than a hardcoded color, right after the style loads.
+function boostRoadContrast(map: MapLibreMap) {
+  const lineOverrides: [string, number][] = [
+    ["highway_path", 0.3],
+    ["highway_minor", 0.35],
+    ["highway_major_subtle", 0.45],
+    ["highway_major_inner", 0.55],
+    ["highway_major_casing", 0.3],
+    ["highway_motorway_subtle", 0.55],
+    ["highway_motorway_inner", 0.75],
+    ["highway_motorway_casing", 0.4],
+  ];
+  const textOverrides: [string, number][] = [
+    ["highway_name_other", 0.55],
+    ["highway_name_motorway", 0.7],
+  ];
+
+  for (const [id, alpha] of lineOverrides) {
+    if (map.getLayer(id)) map.setPaintProperty(id, "line-color", tokenToRgba("--color-white", alpha));
+  }
+  for (const [id, alpha] of textOverrides) {
+    if (map.getLayer(id)) map.setPaintProperty(id, "text-color", tokenToRgba("--color-white", alpha));
+  }
+}
+
 function toTrackCollection(tracks: TrackFeature[]): FeatureCollectionOf<TrackLineFeature> {
   return {
     type: "FeatureCollection",
@@ -114,6 +162,8 @@ export function TrackMap({ tracks, dumps = [] }: { tracks: TrackFeature[]; dumps
     const popup = new Popup({ closeButton: false, offset: 12 });
 
     map.on("load", () => {
+      boostRoadContrast(map);
+
       map.addSource("tracks", { type: "geojson", data: toTrackCollection(tracks) });
       map.addSource("dumps", { type: "geojson", data: toDumpCollection(dumps) });
 
