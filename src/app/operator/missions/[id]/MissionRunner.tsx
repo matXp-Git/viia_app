@@ -253,7 +253,7 @@ export function MissionRunner({ missionId, reference, cityName, clientName, date
               onClick={() => setConfirmingStop(true)}
               disabled={pending || !hasWeighing}
             >
-              Stopper la mission →
+              Stopper ma part →
             </Button>
             {!hasWeighing ? (
               <p className="mt-(--space-2) text-xs text-charcoal/60">Enregistrez la pesée avant de stopper.</p>
@@ -261,9 +261,10 @@ export function MissionRunner({ missionId, reference, cityName, clientName, date
           </>
         ) : (
           <div className="w-full border border-warning p-(--space-4)">
-            <p className="text-sm text-black">Confirmer l&apos;arrêt de la mission ?</p>
+            <p className="text-sm text-black">Confirmer la fin de votre part ?</p>
             <p className="mt-(--space-1) text-xs text-charcoal/60">
-              Le suivi GPS s&apos;arrêtera et votre part sera clôturée.
+              Le suivi GPS s&apos;arrêtera et votre part sera clôturée. La mission elle-même ne se termine que
+              lorsque tous les opérateurs assignés ont terminé.
             </p>
             <div className="mt-(--space-4) flex justify-center gap-(--space-4)">
               <Button variant="ghost" onClick={() => setConfirmingStop(false)} disabled={pending}>
