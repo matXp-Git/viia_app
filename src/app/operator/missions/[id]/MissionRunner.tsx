@@ -3,15 +3,7 @@
 import { useActionState, useEffect, useRef, useState, useTransition } from "react";
 import { Button } from "@/components/ui/Button";
 import { TextField } from "@/components/ui/Field";
-import type { MissionStatus, TrackSegment, Weighing } from "@/lib/types";
-import {
-  completeAssignment,
-  recordPoint,
-  reportWildDump,
-  startSegment,
-  submitWeighing,
-  type WeighingState,
-} from "./actions";
+import { recordPoint, reportWildDump, startSegment, submitWeighing, type WeighingState } from "./actions";
 
 // GPS points every 4s (spec: 3-5s), points with worse than 50m accuracy are
 // dropped client-side before they ever reach the server (§4).
@@ -24,10 +16,6 @@ type Props = {
   cityName: string;
   clientName: string | null;
   date: string;
-  missionStatus: MissionStatus;
-  completedAt: string | null;
-  latestSegment: TrackSegment | null;
-  weighing: Weighing | null;
 };
 
 const weighingInitial: WeighingState = {};
@@ -43,14 +31,13 @@ function LivePulse() {
   );
 }
 
-export function MissionRunner({ missionId, reference, cityName, clientName, date, completedAt, latestSegment, weighing }: Props) {
-  const [activeSegmentId, setActiveSegmentId] = useState<string | null>(latestSegment?.id ?? null);
-  const [completed, setCompleted] = useState(Boolean(completedAt));
+export function MissionRunner({ missionId, reference, cityName, clientName, date }: Props) {
+  const [activeSegmentId, setActiveSegmentId] = useState<string | null>(null);
+  const [tracking, setTracking] = useState(true);
   const [accuracy, setAccuracy] = useState<number | null>(null);
   const [geoError, setGeoError] = useState<string | null>(null);
   const [startError, setStartError] = useState<string | null>(null);
-  const [completeError, setCompleteError] = useState<string | null>(null);
-  const [confirmingStop, setConfirmingStop] = useState(false);
+  const [confirmingEnd, setConfirmingEnd] = useState(false);
   const [pending, startTransition] = useTransition();
 
   const [wildDumpPending, setWildDumpPending] = useState(false);
@@ -61,12 +48,11 @@ export function MissionRunner({ missionId, reference, cityName, clientName, date
     submitWeighing.bind(null, missionId),
     weighingInitial,
   );
-  const hasWeighing = Boolean(weighing) || Boolean(weighingState.success);
 
   const lastPositionRef = useRef<GeolocationPosition | null>(null);
 
   useEffect(() => {
-    if (!activeSegmentId || completed || !geolocationSupported) return;
+    if (!activeSegmentId || !tracking || !geolocationSupported) return;
 
     const watchId = navigator.geolocation.watchPosition(
       (position) => {
@@ -93,7 +79,7 @@ export function MissionRunner({ missionId, reference, cityName, clientName, date
       navigator.geolocation.clearWatch(watchId);
       clearInterval(interval);
     };
-  }, [activeSegmentId, completed]);
+  }, [activeSegmentId, tracking]);
 
   function handleStart(source: "vehicle" | "manual") {
     setStartError(null);
@@ -103,20 +89,10 @@ export function MissionRunner({ missionId, reference, cityName, clientName, date
         setStartError(result.error);
         return;
       }
-      if (result.segmentId) setActiveSegmentId(result.segmentId);
-    });
-  }
-
-  function handleComplete() {
-    setCompleteError(null);
-    startTransition(async () => {
-      const result = await completeAssignment(missionId);
-      if (result.error) {
-        setCompleteError(result.error);
-        setConfirmingStop(false);
-        return;
+      if (result.segmentId) {
+        setActiveSegmentId(result.segmentId);
+        setTracking(true);
       }
-      setCompleted(true);
     });
   }
 
@@ -149,17 +125,13 @@ export function MissionRunner({ missionId, reference, cityName, clientName, date
     );
   }
 
-  const missionMeta = `${cityName}${clientName ? ` · ${clientName}` : ""} · ${date}`;
-
-  if (completed) {
-    return (
-      <main className="mx-auto flex min-h-screen max-w-[480px] flex-col items-center justify-center px-(--gutter) text-center">
-        <p className="text-xs tracking-eyebrow text-charcoal/60">{reference}</p>
-        <h1 className="mt-(--space-2) text-display-sm">Mission terminée</h1>
-        <p className="mt-(--space-2) text-sm text-charcoal/85">Votre part de cette mission est terminée.</p>
-      </main>
-    );
+  function handleEndSession() {
+    setActiveSegmentId(null);
+    setTracking(true);
+    setConfirmingEnd(false);
   }
+
+  const missionMeta = `${cityName}${clientName ? ` · ${clientName}` : ""} · ${date}`;
 
   if (!activeSegmentId) {
     return (
@@ -169,6 +141,9 @@ export function MissionRunner({ missionId, reference, cityName, clientName, date
         <Button variant="accent" onClick={() => handleStart("vehicle")} disabled={pending} className="mt-(--space-7)">
           {pending ? "Démarrage..." : "Démarrer la mission →"}
         </Button>
+        <p className="mt-(--space-3) text-xs text-charcoal/60">
+          Reprenez ici à tout moment — même un autre jour — s&apos;il reste du travail sur cette mission.
+        </p>
         {startError ? <p className="mt-(--space-2) text-xs text-critical">{startError}</p> : null}
       </main>
     );
@@ -179,105 +154,103 @@ export function MissionRunner({ missionId, reference, cityName, clientName, date
     <main className="mx-auto flex min-h-screen max-w-[480px] flex-col px-(--gutter) py-(--space-9)">
       <div className="flex flex-col items-center text-center">
         <div className="flex items-center gap-(--space-3)">
-          <LivePulse />
-          <span className="text-xs uppercase tracking-eyebrow text-charcoal/60">Mission en cours</span>
+          {tracking ? <LivePulse /> : <span className="h-3 w-3 rounded-full border border-line" />}
+          <span className="text-xs uppercase tracking-eyebrow text-charcoal/60">
+            {tracking ? "Mission en cours" : "Suivi en pause"}
+          </span>
         </div>
         <h1 className="mt-(--space-4) text-display-lg">{reference}</h1>
         <p className="mt-(--space-2) text-sm text-charcoal/60">{missionMeta}</p>
       </div>
 
-      <div className="mt-(--space-7) border border-line p-(--space-4) text-center">
-        <div className="text-2xs uppercase tracking-label text-charcoal/60">Suivi GPS</div>
-        <p className="mt-(--space-2) text-sm text-black">
-          {!geolocationSupported
-            ? "Géolocalisation indisponible sur cet appareil."
-            : geoError
-              ? geoError
-              : accuracy !== null
-                ? `Précision actuelle : ${Math.round(accuracy)} m`
-                : "En attente de signal GPS..."}
-        </p>
-      </div>
-
-      <div className="mt-(--space-6) flex flex-wrap justify-center gap-(--space-4)">
-        <Button variant="ghost" onClick={() => handleStart("manual")} disabled={pending}>
-          Segment manuel
-        </Button>
-        <Button
-          variant="ghost"
-          onClick={handleWildDump}
-          disabled={wildDumpPending}
-          className="!border-warning !text-warning"
-        >
-          {wildDumpPending ? "Localisation..." : "Dépôt sauvage"}
-        </Button>
-      </div>
-      {wildDumpSuccess ? (
-        <p className="mt-(--space-2) text-center text-xs text-success">Point enregistré ✓</p>
-      ) : null}
-      {wildDumpError ? <p className="mt-(--space-2) text-center text-xs text-critical">{wildDumpError}</p> : null}
-
-      <div className="mt-(--space-7) border-t border-line pt-(--space-6)">
-        <div className="text-center text-2xs uppercase tracking-label text-charcoal/60">Pesée</div>
-        <form action={weighingAction} className="mt-(--space-3) flex flex-wrap items-end justify-center gap-(--space-4)">
-          <TextField
-            label="Poids total (kg)"
-            name="kilos_total"
-            type="number"
-            step="0.1"
-            min="0"
-            defaultValue={weighing?.kilos_total}
-            required
-          />
-          <TextField
-            label="Dont recyclé (kg)"
-            name="kilos_recycled"
-            type="number"
-            step="0.1"
-            min="0"
-            defaultValue={weighing?.kilos_recycled}
-            required
-          />
-          {weighingState.error ? <p className="w-full text-center text-xs text-critical">{weighingState.error}</p> : null}
-          <Button type="submit" variant="ghost" disabled={weighingPending}>
-            {weighingPending ? "Enregistrement..." : hasWeighing ? "Mettre à jour la pesée" : "Enregistrer la pesée"}
-          </Button>
-        </form>
-      </div>
-
-      <div className="mt-(--space-7) flex flex-col items-center border-t border-line pt-(--space-6) text-center">
-        {!confirmingStop ? (
-          <>
-            <Button
-              variant="accent"
-              onClick={() => setConfirmingStop(true)}
-              disabled={pending || !hasWeighing}
-            >
-              Stopper ma part →
-            </Button>
-            {!hasWeighing ? (
-              <p className="mt-(--space-2) text-xs text-charcoal/60">Enregistrez la pesée avant de stopper.</p>
-            ) : null}
-          </>
-        ) : (
-          <div className="w-full border border-warning p-(--space-4)">
-            <p className="text-sm text-black">Confirmer la fin de votre part ?</p>
-            <p className="mt-(--space-1) text-xs text-charcoal/60">
-              Le suivi GPS s&apos;arrêtera et votre part sera clôturée. La mission elle-même ne se termine que
-              lorsque tous les opérateurs assignés ont terminé.
+      {tracking ? (
+        <>
+          <div className="mt-(--space-7) border border-line p-(--space-4) text-center">
+            <div className="text-2xs uppercase tracking-label text-charcoal/60">Suivi GPS</div>
+            <p className="mt-(--space-2) text-sm text-black">
+              {!geolocationSupported
+                ? "Géolocalisation indisponible sur cet appareil."
+                : geoError
+                  ? geoError
+                  : accuracy !== null
+                    ? `Précision actuelle : ${Math.round(accuracy)} m`
+                    : "En attente de signal GPS..."}
             </p>
-            <div className="mt-(--space-4) flex justify-center gap-(--space-4)">
-              <Button variant="ghost" onClick={() => setConfirmingStop(false)} disabled={pending}>
-                Annuler
-              </Button>
-              <Button variant="accent" onClick={handleComplete} disabled={pending}>
-                {pending ? "..." : "Oui, stopper →"}
-              </Button>
-            </div>
           </div>
-        )}
-        {completeError ? <p className="mt-(--space-2) text-xs text-critical">{completeError}</p> : null}
-      </div>
+
+          <div className="mt-(--space-6) flex flex-wrap justify-center gap-(--space-4)">
+            <Button variant="ghost" onClick={() => handleStart("manual")} disabled={pending}>
+              Segment manuel
+            </Button>
+            <Button
+              variant="ghost"
+              onClick={handleWildDump}
+              disabled={wildDumpPending}
+              className="!border-warning !text-warning"
+            >
+              {wildDumpPending ? "Localisation..." : "Dépôt sauvage"}
+            </Button>
+          </div>
+          {wildDumpSuccess ? <p className="mt-(--space-2) text-center text-xs text-success">Point enregistré ✓</p> : null}
+          {wildDumpError ? <p className="mt-(--space-2) text-center text-xs text-critical">{wildDumpError}</p> : null}
+
+          <div className="mt-(--space-7) flex flex-col items-center border-t border-line pt-(--space-6)">
+            <Button variant="accent" onClick={() => setTracking(false)}>
+              Mettre en pause →
+            </Button>
+            <p className="mt-(--space-2) text-xs text-charcoal/60">
+              Pour le retour au dépôt — le trajet ne sera pas enregistré.
+            </p>
+          </div>
+        </>
+      ) : (
+        <>
+          <div className="mt-(--space-7) border-t border-line pt-(--space-6)">
+            <div className="text-center text-2xs uppercase tracking-label text-charcoal/60">Pesée</div>
+            <form action={weighingAction} className="mt-(--space-3) flex flex-wrap items-end justify-center gap-(--space-4)">
+              <TextField label="Poids total (kg)" name="kilos_total" type="number" step="0.1" min="0" required />
+              <TextField label="Dont recyclé (kg)" name="kilos_recycled" type="number" step="0.1" min="0" required />
+              {weighingState.error ? <p className="w-full text-center text-xs text-critical">{weighingState.error}</p> : null}
+              {weighingState.success ? <p className="w-full text-center text-xs text-success">Pesée enregistrée ✓</p> : null}
+              <Button type="submit" variant="ghost" disabled={weighingPending}>
+                {weighingPending ? "Enregistrement..." : "Enregistrer la pesée"}
+              </Button>
+            </form>
+          </div>
+
+          <div className="mt-(--space-7) flex flex-col items-center border-t border-line pt-(--space-6) text-center">
+            {!confirmingEnd ? (
+              <>
+                <Button variant="accent" onClick={() => setConfirmingEnd(true)}>
+                  Terminer ma session →
+                </Button>
+                <button
+                  type="button"
+                  onClick={() => setTracking(true)}
+                  className="mt-(--space-3) text-xs uppercase tracking-label text-charcoal/60 focus-ring hover:text-black"
+                >
+                  Reprendre le suivi
+                </button>
+              </>
+            ) : (
+              <div className="w-full border border-warning p-(--space-4)">
+                <p className="text-sm text-black">Terminer votre session sur cette mission ?</p>
+                <p className="mt-(--space-1) text-xs text-charcoal/60">
+                  Vous pourrez reprendre à tout moment, même un autre jour — seul le manager termine la mission.
+                </p>
+                <div className="mt-(--space-4) flex justify-center gap-(--space-4)">
+                  <Button variant="ghost" onClick={() => setConfirmingEnd(false)}>
+                    Annuler
+                  </Button>
+                  <Button variant="accent" onClick={handleEndSession}>
+                    Oui, terminer →
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
+        </>
+      )}
     </main>
   );
 }

@@ -19,18 +19,6 @@ export async function startSegment(missionId: string, source: TrackSource): Prom
   const appUser = await requireOperator();
   const supabase = await createClient();
 
-  // TEMP diagnostic for the RLS 42501 investigation — remove once resolved.
-  const {
-    data: { user: authUser },
-  } = await supabase.auth.getUser();
-  const { data: selfRow, error: selfError } = await supabase
-    .from("app_user")
-    .select("id, operator_id")
-    .eq("id", appUser.id)
-    .maybeSingle();
-  const { data: rpcOperatorId, error: rpcError } = await supabase.rpc("app_operator_id");
-  const { data: rpcRole, error: rpcRoleError } = await supabase.rpc("app_role");
-
   const { data, error } = await supabase
     .from("track_segment")
     .insert({ mission_id: missionId, operator_id: appUser.operator_id, source })
@@ -38,17 +26,7 @@ export async function startSegment(missionId: string, source: TrackSource): Prom
     .single();
 
   if (error || !data) {
-    console.error("startSegment failed", {
-      error,
-      appUserId: appUser.id,
-      appUserOperatorId: appUser.operator_id,
-      authUserId: authUser?.id,
-      selfRow,
-      selfError,
-    });
-    return {
-      error: `Impossible de démarrer le segment. ${error?.message ?? ""} (${error?.code ?? "no data"}) | auth=${authUser?.id ?? "null"} appUser=${appUser.id} op=${appUser.operator_id} self=${JSON.stringify(selfRow)} selfErr=${selfError?.message ?? "none"} rpcOp=${rpcOperatorId ?? "null"} rpcOpErr=${rpcError?.message ?? "none"} rpcRole=${rpcRole ?? "null"} rpcRoleErr=${rpcRoleError?.message ?? "none"}`,
-    };
+    return { error: "Impossible de démarrer le segment." };
   }
 
   revalidatePath(`/operator/missions/${missionId}`);
@@ -62,6 +40,9 @@ export async function recordPoint(segmentId: string, lat: number, lng: number, r
 
 export type WeighingState = { error?: string; success?: boolean };
 
+// Missions can span several days/sessions, so each weigh-in is its own
+// record (not upserted) — otherwise a second weigh-in would silently erase
+// the first one's numbers instead of adding to the mission's total.
 export async function submitWeighing(
   missionId: string,
   _prevState: WeighingState,
@@ -82,10 +63,7 @@ export async function submitWeighing(
 
   const { error } = await supabase
     .from("weighing")
-    .upsert(
-      { mission_id: missionId, operator_id: appUser.operator_id, kilos_total: kilosTotal, kilos_recycled: kilosRecycled },
-      { onConflict: "mission_id,operator_id" },
-    );
+    .insert({ mission_id: missionId, operator_id: appUser.operator_id, kilos_total: kilosTotal, kilos_recycled: kilosRecycled });
 
   if (error) {
     return { error: "Erreur lors de l'enregistrement de la pesée." };
@@ -108,35 +86,5 @@ export async function reportWildDump(missionId: string, lat: number, lng: number
   }
 
   revalidatePath(`/operator/missions/${missionId}`);
-  return {};
-}
-
-export async function completeAssignment(missionId: string): Promise<ActionResult> {
-  const appUser = await requireOperator();
-  const supabase = await createClient();
-
-  const { data: weighing } = await supabase
-    .from("weighing")
-    .select("id")
-    .eq("mission_id", missionId)
-    .eq("operator_id", appUser.operator_id)
-    .maybeSingle();
-
-  if (!weighing) {
-    return { error: "Enregistrez votre pesée avant de terminer." };
-  }
-
-  const { error } = await supabase
-    .from("mission_assignment")
-    .update({ completed_at: new Date().toISOString() })
-    .eq("mission_id", missionId)
-    .eq("operator_id", appUser.operator_id);
-
-  if (error) {
-    return { error: "Erreur lors de la clôture." };
-  }
-
-  revalidatePath(`/operator/missions/${missionId}`);
-  revalidatePath("/operator");
   return {};
 }

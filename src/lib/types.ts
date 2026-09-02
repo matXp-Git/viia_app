@@ -31,7 +31,6 @@ export type MissionAssignment = {
   id: string;
   mission_id: string;
   operator_id: string;
-  completed_at: string | null;
 };
 
 export type TrackSegment = {

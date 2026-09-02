@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import type { City, Client, Mission } from "@/lib/types";
-import { updateMission } from "./actions";
+import { updateMission, completeMission } from "./actions";
 import { Button } from "@/components/ui/Button";
 import { SelectField, TextField } from "@/components/ui/Field";
 import { MissionStatusBadge } from "@/components/ui/StatusBadge";
@@ -20,6 +20,14 @@ export function MissionHeader({ mission, city, client, cities, clients }: Props)
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
   const canEdit = mission.status === "planned";
+  const canComplete = mission.status !== "completed";
+
+  function handleComplete() {
+    if (!confirm("Marquer cette mission comme terminée ? Elle ne sera plus modifiable ni accessible aux opérateurs.")) {
+      return;
+    }
+    startTransition(() => completeMission(mission.id));
+  }
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -52,6 +60,16 @@ export function MissionHeader({ mission, city, client, cities, clients }: Props)
               className="text-xs uppercase tracking-label text-charcoal/60 underline decoration-line underline-offset-2 focus-ring hover:text-black"
             >
               Modifier
+            </button>
+          ) : null}
+          {canComplete ? (
+            <button
+              type="button"
+              onClick={handleComplete}
+              disabled={pending}
+              className="text-xs uppercase tracking-label text-critical focus-ring disabled:opacity-40"
+            >
+              Terminer la mission
             </button>
           ) : null}
           <MissionStatusBadge status={mission.status} />

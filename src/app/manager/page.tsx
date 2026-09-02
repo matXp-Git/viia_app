@@ -72,14 +72,12 @@ export default async function ManagerMissionsPage() {
                     <span className="text-xs text-charcoal/60">Aucun opérateur actif.</span>
                   ) : null}
                 </div>
-                {mission.status === "planned" ? (
+                {mission.status !== "completed" ? (
                   <Button type="submit" variant="ghost" className="mt-(--space-3)">
                     Mettre à jour l&apos;affectation
                   </Button>
                 ) : (
-                  <p className="mt-(--space-3) text-xs text-charcoal/60">
-                    Mission {mission.status === "completed" ? "terminée" : "en cours"} — affectation verrouillée.
-                  </p>
+                  <p className="mt-(--space-3) text-xs text-charcoal/60">Mission terminée — affectation verrouillée.</p>
                 )}
               </form>
             </div>

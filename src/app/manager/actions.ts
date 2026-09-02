@@ -145,12 +145,27 @@ export async function updateMission(missionId: string, _prevState: FormState, fo
   return { success: true };
 }
 
+// Ending a mission is a manager-only decision: it may run over several days
+// and several operators/sessions, so no automatic trigger can know when
+// it's actually done.
+export async function completeMission(missionId: string) {
+  await requireManager();
+  const supabase = await createSupabaseClient();
+  await supabase
+    .from("mission")
+    .update({ status: "completed", ended_at: new Date().toISOString() })
+    .eq("id", missionId);
+  revalidatePath("/manager");
+}
+
 export async function setMissionAssignments(missionId: string, operatorIds: string[]) {
   await requireManager();
   const supabase = await createSupabaseClient();
 
   const { data: mission } = await supabase.from("mission").select("status").eq("id", missionId).single();
-  if (mission?.status !== "planned") {
+  // A mission can run over several days/operators, so assignment stays
+  // editable while it's ongoing — only a manager-completed mission locks it.
+  if (mission?.status === "completed") {
     return;
   }
 
