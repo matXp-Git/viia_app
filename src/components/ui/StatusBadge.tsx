@@ -10,7 +10,7 @@ const missionLabel: Record<MissionStatus, string> = {
 };
 
 const missionStyle: Record<MissionStatus, string> = {
-  planned: "border border-line text-charcoal/60",
+  planned: "border border-divider text-muted",
   in_progress: "bg-accent/70 text-accent-text",
   completed: "bg-success-bg text-success",
 };
@@ -22,7 +22,7 @@ const operatorLabel: Record<OperatorStatus, string> = {
 
 const operatorStyle: Record<OperatorStatus, string> = {
   active: "bg-success-bg text-success",
-  inactive: "border border-line text-charcoal/60 opacity-70",
+  inactive: "border border-divider text-muted opacity-70",
 };
 
 export function MissionStatusBadge({ status }: { status: MissionStatus }) {

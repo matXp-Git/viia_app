@@ -1,9 +1,9 @@
 import type { InputHTMLAttributes, SelectHTMLAttributes } from "react";
 
 const controlBase =
-  "bg-transparent border border-line rounded-sm px-(--space-3) py-(--space-3) text-sm text-charcoal focus-ring disabled:opacity-45 disabled:cursor-not-allowed";
+  "bg-transparent border border-divider rounded-sm px-(--space-3) py-(--space-3) text-sm text-body focus-ring disabled:opacity-45 disabled:cursor-not-allowed";
 
-const labelBase = "text-2xs uppercase tracking-label text-charcoal/60";
+const labelBase = "text-2xs uppercase tracking-label text-muted";
 
 type FieldWrapperProps = {
   label: string;

@@ -18,12 +18,12 @@ export default async function VillesPage() {
 
       <div className="mt-(--space-6) flex flex-col">
         {((cities ?? []) as City[]).map((city) => (
-          <div key={city.id} className="flex items-center justify-between gap-(--space-4) border-t border-line py-(--space-3) last:border-b">
-            <span className="text-sm text-black">{city.name}</span>
+          <div key={city.id} className="flex items-center justify-between gap-(--space-4) border-t border-divider py-(--space-3) last:border-b">
+            <span className="text-sm text-heading">{city.name}</span>
             <DataLabel>{city.code}</DataLabel>
           </div>
         ))}
-        {(cities ?? []).length === 0 ? <p className="py-(--space-3) text-sm text-charcoal/60">Aucune ville.</p> : null}
+        {(cities ?? []).length === 0 ? <p className="py-(--space-3) text-sm text-muted">Aucune ville.</p> : null}
       </div>
     </div>
   );

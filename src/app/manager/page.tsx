@@ -44,7 +44,7 @@ export default async function ManagerMissionsPage() {
           const boundAction = updateMissionAssignments.bind(null, mission.id);
 
           return (
-            <div key={mission.id} className="border border-line p-(--space-5)">
+            <div key={mission.id} className="border border-divider p-(--space-5)">
               <MissionHeader
                 mission={mission}
                 city={city}
@@ -53,11 +53,11 @@ export default async function ManagerMissionsPage() {
                 clients={(clients ?? []) as Client[]}
               />
 
-              <form action={boundAction} className="mt-(--space-4) border-t border-line pt-(--space-4)">
-                <div className="text-2xs uppercase tracking-label text-charcoal/60">Opérateurs affectés</div>
+              <form action={boundAction} className="mt-(--space-4) border-t border-divider pt-(--space-4)">
+                <div className="text-2xs uppercase tracking-label text-muted">Opérateurs affectés</div>
                 <div className="mt-(--space-2) flex flex-wrap gap-(--space-4)">
                   {(operators ?? []).map((op: Operator) => (
-                    <label key={op.id} className="flex items-center gap-(--space-1) text-sm text-black">
+                    <label key={op.id} className="flex items-center gap-(--space-1) text-sm text-heading">
                       <input
                         type="checkbox"
                         name="operator_ids"
@@ -69,7 +69,7 @@ export default async function ManagerMissionsPage() {
                     </label>
                   ))}
                   {(operators ?? []).length === 0 ? (
-                    <span className="text-xs text-charcoal/60">Aucun opérateur actif.</span>
+                    <span className="text-xs text-muted">Aucun opérateur actif.</span>
                   ) : null}
                 </div>
                 {mission.status !== "completed" ? (
@@ -77,13 +77,13 @@ export default async function ManagerMissionsPage() {
                     Mettre à jour l&apos;affectation
                   </Button>
                 ) : (
-                  <p className="mt-(--space-3) text-xs text-charcoal/60">Mission terminée — affectation verrouillée.</p>
+                  <p className="mt-(--space-3) text-xs text-muted">Mission terminée — affectation verrouillée.</p>
                 )}
               </form>
             </div>
           );
         })}
-        {(missions ?? []).length === 0 ? <p className="text-sm text-charcoal/60">Aucune mission pour le moment.</p> : null}
+        {(missions ?? []).length === 0 ? <p className="text-sm text-muted">Aucune mission pour le moment.</p> : null}
       </div>
     </div>
   );

@@ -112,7 +112,7 @@ export default async function PortalHome({ searchParams }: { searchParams: Promi
       <Eyebrow>Vos missions</Eyebrow>
       <h1 className="mt-(--space-2) text-display-sm">Suivi de collecte</h1>
 
-      <form method="get" className="mt-(--space-6) flex flex-wrap items-end gap-(--space-4) border border-line p-(--space-4)">
+      <form method="get" className="mt-(--space-6) flex flex-wrap items-end gap-(--space-4) border border-divider p-(--space-4)">
         <TextField label="Du" name="from" type="date" defaultValue={from} />
         <TextField label="Au" name="to" type="date" defaultValue={to} />
         <Button type="submit" variant="ghost">
@@ -120,18 +120,18 @@ export default async function PortalHome({ searchParams }: { searchParams: Promi
         </Button>
       </form>
 
-      <div className="mt-(--space-7) grid grid-cols-3 gap-px border border-line bg-line mobile:grid-cols-1">
-        <div className="bg-white p-(--space-4)">
-          <div className="text-2xs uppercase text-charcoal/60">Total collecté</div>
-          <div className="mt-(--space-2) text-sm font-bold text-black">{kilosTotal.toFixed(1)} kg</div>
+      <div className="mt-(--space-7) grid grid-cols-3 gap-px border border-divider bg-divider mobile:grid-cols-1">
+        <div className="bg-surface p-(--space-4)">
+          <div className="text-2xs uppercase text-muted">Total collecté</div>
+          <div className="mt-(--space-2) text-sm font-bold text-heading">{kilosTotal.toFixed(1)} kg</div>
         </div>
-        <div className="bg-white p-(--space-4)">
-          <div className="text-2xs uppercase text-charcoal/60">Dont recyclé</div>
-          <div className="mt-(--space-2) text-sm font-bold text-black">{kilosRecycled.toFixed(1)} kg</div>
+        <div className="bg-surface p-(--space-4)">
+          <div className="text-2xs uppercase text-muted">Dont recyclé</div>
+          <div className="mt-(--space-2) text-sm font-bold text-heading">{kilosRecycled.toFixed(1)} kg</div>
         </div>
-        <div className="bg-white p-(--space-4)">
-          <div className="text-2xs uppercase text-charcoal/60">Taux de recyclage</div>
-          <div className="mt-(--space-2) text-sm font-bold text-black">{recyclingRate !== null ? `${recyclingRate}%` : "—"}</div>
+        <div className="bg-surface p-(--space-4)">
+          <div className="text-2xs uppercase text-muted">Taux de recyclage</div>
+          <div className="mt-(--space-2) text-sm font-bold text-heading">{recyclingRate !== null ? `${recyclingRate}%` : "—"}</div>
         </div>
       </div>
 
@@ -148,16 +148,16 @@ export default async function PortalHome({ searchParams }: { searchParams: Promi
           {missions.map((mission) => (
             <div
               key={mission.mission_id}
-              className="flex flex-wrap items-center justify-between gap-(--space-4) border-t border-line py-(--space-3) last:border-b"
+              className="flex flex-wrap items-center justify-between gap-(--space-4) border-t border-divider py-(--space-3) last:border-b"
             >
               <div>
-                <div className="text-sm font-bold text-black">{mission.reference}</div>
-                <div className="mt-1 text-xs text-charcoal/60">{mission.date}</div>
+                <div className="text-sm font-bold text-heading">{mission.reference}</div>
+                <div className="mt-1 text-xs text-muted">{mission.date}</div>
               </div>
               <div className="flex items-center gap-(--space-4)">
-                <span className="text-sm text-black">
+                <span className="text-sm text-heading">
                   {Number(mission.kilos_total).toFixed(1)} kg
-                  <span className="ml-(--space-2) text-xs text-charcoal/60">
+                  <span className="ml-(--space-2) text-xs text-muted">
                     ({Number(mission.kilos_recycled).toFixed(1)} kg recyclé)
                   </span>
                 </span>
@@ -165,7 +165,7 @@ export default async function PortalHome({ searchParams }: { searchParams: Promi
               </div>
             </div>
           ))}
-          {missions.length === 0 ? <p className="py-(--space-3) text-sm text-charcoal/60">Aucune mission sur la période.</p> : null}
+          {missions.length === 0 ? <p className="py-(--space-3) text-sm text-muted">Aucune mission sur la période.</p> : null}
         </div>
       </div>
     </main>

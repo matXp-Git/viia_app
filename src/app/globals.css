@@ -8,7 +8,59 @@
  */
 @import "../../References/viia-design-tokens.css";
 
+/*
+ * Semantic surface/text tokens — not part of the design system hand-off
+ * file (it only exports one literal palette), but not invented either: the
+ * dark values below are copied verbatim from
+ * References/viia-design-system.html's own `:root[data-theme="dark"]`
+ * block (its reference page already implements both "terrains" — see §02).
+ *
+ * These exist so shared components can reference a role ("page background",
+ * "card surface", "heading text") instead of a literal brand color, which
+ * is what lets a surface flip from light to dark by toggling one attribute
+ * instead of touching every component. Per-surface, not user-toggleable:
+ * manager/portal always carry [data-theme="dark"], operator/login never do
+ * (screen mounted in a vehicle, daylight readability matters more there
+ * than matching the marketing site).
+ */
+:root {
+  --color-page: var(--color-offwhite);
+  --color-surface: var(--color-white);
+  --color-heading: var(--color-black);
+  --color-body: var(--color-charcoal);
+  --color-muted: rgba(68, 74, 77, 0.6);
+  --color-divider: var(--color-line);
+}
+
+[data-theme="dark"] {
+  /* Native controls (select popups, the date picker) follow this rather
+     than our CSS vars — without it they'd keep light OS-native chrome. */
+  color-scheme: dark;
+
+  --color-page: var(--color-black);
+  --color-surface: #1d1e20;
+  --color-heading: var(--color-white);
+  --color-body: rgba(255, 255, 255, 0.78);
+  --color-muted: rgba(255, 255, 255, 0.5);
+  --color-divider: var(--color-line-dark);
+
+  /* Same source as above — viia-design-system.html darkens the
+     completed/active badge specifically, rather than reusing the light
+     success color as-is (it would look washed out on black). */
+  --color-success: #8fc7a6;
+  --color-success-bg: rgba(76, 122, 94, 0.25);
+}
+
 @theme inline {
+  /* ---- semantic roles: exposes bg-page, bg-surface, text-heading, etc.
+     — flip with each other by toggling [data-theme="dark"], see above ---- */
+  --color-page: var(--color-page);
+  --color-surface: var(--color-surface);
+  --color-heading: var(--color-heading);
+  --color-body: var(--color-body);
+  --color-muted: var(--color-muted);
+  --color-divider: var(--color-divider);
+
   /* ---- colors: exposes bg-accent, text-charcoal, border-line, etc. ---- */
   --color-accent: var(--color-accent);
   --color-accent-text: var(--color-black);
@@ -67,8 +119,8 @@
 }
 
 body {
-  background: var(--color-offwhite);
-  color: var(--color-charcoal);
+  background: var(--color-page);
+  color: var(--color-body);
   font-family: var(--font-mono);
   font-size: var(--text-base);
   line-height: var(--leading-normal);
@@ -86,16 +138,16 @@ h2,
 h3 {
   font-weight: var(--weight-regular);
   text-transform: uppercase;
-  color: var(--color-black);
+  color: var(--color-heading);
   margin: 0;
 }
 
 a {
-  color: var(--color-black);
+  color: var(--color-heading);
 }
 
 .focus-ring:focus-visible {
   outline: none;
-  border-color: var(--color-black);
+  border-color: var(--color-heading);
   box-shadow: var(--focus-ring);
 }

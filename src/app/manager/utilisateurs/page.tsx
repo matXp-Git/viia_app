@@ -43,7 +43,7 @@ export default async function UtilisateursPage() {
     <div>
       <Eyebrow>Utilisateurs</Eyebrow>
       <h1 className="mt-(--space-2) text-display-sm">Comptes ViiA Pick</h1>
-      <p className="mt-(--space-2) max-w-[62ch] text-sm text-charcoal/85">
+      <p className="mt-(--space-2) max-w-[62ch] text-sm text-body">
         Pour créer un compte : ajoutez-le d&apos;abord dans Supabase (Authentication → Add user), copiez son
         identifiant (UUID), puis liez-le ici à un rôle et à une entité. Une erreur de saisie (mauvais rôle,
         mauvaise entité) se corrige avec « Modifier », sans recréer le compte.
@@ -65,7 +65,7 @@ export default async function UtilisateursPage() {
             cities={allCities.filter((c) => !linkedCityIds.has(c.id) || c.id === user.city_id)}
           />
         ))}
-        {users.length === 0 ? <p className="py-(--space-3) text-sm text-charcoal/60">Aucun compte lié.</p> : null}
+        {users.length === 0 ? <p className="py-(--space-3) text-sm text-muted">Aucun compte lié.</p> : null}
       </div>
     </div>
   );

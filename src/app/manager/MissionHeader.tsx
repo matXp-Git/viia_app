@@ -48,10 +48,10 @@ export function MissionHeader({ mission, city, client, cities, clients }: Props)
     return (
       <div className="flex flex-wrap items-center justify-between gap-(--space-3)">
         <div>
-          <Link href={`/manager/missions/${mission.id}`} className="text-sm font-bold text-black underline decoration-line underline-offset-2 hover:decoration-black">
+          <Link href={`/manager/missions/${mission.id}`} className="text-sm font-bold text-heading underline decoration-divider underline-offset-2 hover:decoration-heading">
             {mission.reference ?? "—"}
           </Link>
-          <div className="mt-1 text-xs text-charcoal/60">
+          <div className="mt-1 text-xs text-muted">
             {city?.name ?? "?"} · {client?.name ?? "Sans client"} · {mission.date}
           </div>
         </div>
@@ -60,7 +60,7 @@ export function MissionHeader({ mission, city, client, cities, clients }: Props)
             <button
               type="button"
               onClick={() => setEditing(true)}
-              className="text-xs uppercase tracking-label text-charcoal/60 underline decoration-line underline-offset-2 focus-ring hover:text-black"
+              className="text-xs uppercase tracking-label text-muted underline decoration-divider underline-offset-2 focus-ring hover:text-heading"
             >
               Modifier
             </button>
@@ -106,7 +106,7 @@ export function MissionHeader({ mission, city, client, cities, clients }: Props)
       <button
         type="button"
         onClick={() => setEditing(false)}
-        className="text-xs uppercase tracking-label text-charcoal/60 focus-ring hover:text-black"
+        className="text-xs uppercase tracking-label text-muted focus-ring hover:text-heading"
       >
         Annuler
       </button>

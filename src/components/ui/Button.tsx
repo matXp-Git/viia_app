@@ -8,7 +8,7 @@ const base =
 
 const variants: Record<Variant, string> = {
   accent: "bg-accent text-accent-text",
-  ghost: "border border-black text-black",
+  ghost: "border border-heading text-heading",
 };
 
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {

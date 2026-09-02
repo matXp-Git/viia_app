@@ -49,15 +49,15 @@ export function AppUserRow({ user, scopeName, operators, clients, cities }: Prop
 
   if (!editing) {
     return (
-      <div className="flex items-center justify-between gap-(--space-4) border-t border-line py-(--space-3) last:border-b">
-        <span className="text-xs text-charcoal/60">{user.id}</span>
-        <span className="text-sm text-black">{scopeName}</span>
-        <span className="text-xs uppercase tracking-label text-charcoal/60">{user.role}</span>
+      <div className="flex items-center justify-between gap-(--space-4) border-t border-divider py-(--space-3) last:border-b">
+        <span className="text-xs text-muted">{user.id}</span>
+        <span className="text-sm text-heading">{scopeName}</span>
+        <span className="text-xs uppercase tracking-label text-muted">{user.role}</span>
         <div className="flex items-center gap-(--space-3)">
           <button
             type="button"
             onClick={() => setEditing(true)}
-            className="text-xs uppercase tracking-label text-charcoal/60 underline decoration-line underline-offset-2 focus-ring hover:text-black"
+            className="text-xs uppercase tracking-label text-muted underline decoration-divider underline-offset-2 focus-ring hover:text-heading"
           >
             Modifier
           </button>
@@ -77,9 +77,9 @@ export function AppUserRow({ user, scopeName, operators, clients, cities }: Prop
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex flex-wrap items-end gap-(--space-4) border-t border-line py-(--space-4) last:border-b"
+      className="flex flex-wrap items-end gap-(--space-4) border-t border-divider py-(--space-4) last:border-b"
     >
-      <span className="text-xs text-charcoal/60">{user.id}</span>
+      <span className="text-xs text-muted">{user.id}</span>
       <SelectField label="Rôle" value={role} onChange={(e) => setRole(e.target.value as Role)} name="role">
         {(Object.keys(roleLabel) as Role[]).map((r) => (
           <option key={r} value={r}>
@@ -132,7 +132,7 @@ export function AppUserRow({ user, scopeName, operators, clients, cities }: Prop
       <button
         type="button"
         onClick={() => setEditing(false)}
-        className="text-xs uppercase tracking-label text-charcoal/60 focus-ring hover:text-black"
+        className="text-xs uppercase tracking-label text-muted focus-ring hover:text-heading"
       >
         Annuler
       </button>

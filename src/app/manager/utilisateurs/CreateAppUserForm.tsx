@@ -27,7 +27,7 @@ export function CreateAppUserForm({ operators, clients, cities }: Props) {
   const [role, setRole] = useState<Role>("operator");
 
   return (
-    <form action={formAction} className="flex flex-wrap items-end gap-(--space-4) border border-line p-(--space-4)">
+    <form action={formAction} className="flex flex-wrap items-end gap-(--space-4) border border-divider p-(--space-4)">
       <TextField
         label="ID utilisateur (Supabase Auth)"
         name="auth_user_id"

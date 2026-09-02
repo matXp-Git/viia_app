@@ -22,11 +22,11 @@ export default async function OperateursPage() {
         {((operators ?? []) as Operator[]).map((operator) => (
           <div
             key={operator.id}
-            className="flex flex-wrap items-center justify-between gap-(--space-4) border-t border-line py-(--space-3) last:border-b"
+            className="flex flex-wrap items-center justify-between gap-(--space-4) border-t border-divider py-(--space-3) last:border-b"
           >
             <div>
-              <div className="text-sm text-black">{operator.name}</div>
-              <div className="mt-1 text-xs text-charcoal/60">
+              <div className="text-sm text-heading">{operator.name}</div>
+              <div className="mt-1 text-xs text-muted">
                 {operator.contact ?? "—"} · <DataLabel>{operator.matricule}</DataLabel>
               </div>
             </div>
@@ -36,7 +36,7 @@ export default async function OperateursPage() {
             </div>
           </div>
         ))}
-        {(operators ?? []).length === 0 ? <p className="py-(--space-3) text-sm text-charcoal/60">Aucun opérateur.</p> : null}
+        {(operators ?? []).length === 0 ? <p className="py-(--space-3) text-sm text-muted">Aucun opérateur.</p> : null}
       </div>
     </div>
   );

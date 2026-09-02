@@ -20,23 +20,25 @@ export default async function ManagerLayout({ children }: { children: React.Reac
   if (appUser.role !== "manager") redirect(roleHome(appUser.role));
 
   return (
-    <div className="mx-auto max-w-(--container-max) px-(--gutter) py-(--space-7)">
-      <header className="mb-(--space-7) flex flex-wrap items-center justify-between gap-(--space-4) border-b border-line pb-(--space-4)">
-        <Eyebrow>Dashboard manager</Eyebrow>
-        <nav className="flex flex-wrap gap-(--space-5) text-xs uppercase tracking-label text-charcoal/60">
-          {navLinks.map((link) => (
-            <Link key={link.href} href={link.href} className="hover:text-black">
-              {link.label}
-            </Link>
-          ))}
-        </nav>
-        <form action={signOut}>
-          <button type="submit" className="text-xs uppercase tracking-label text-charcoal/60 focus-ring hover:text-black">
-            Déconnexion →
-          </button>
-        </form>
-      </header>
-      {children}
+    <div data-theme="dark" className="min-h-screen bg-page text-body">
+      <div className="mx-auto max-w-(--container-max) px-(--gutter) py-(--space-7)">
+        <header className="mb-(--space-7) flex flex-wrap items-center justify-between gap-(--space-4) border-b border-divider pb-(--space-4)">
+          <Eyebrow>Dashboard manager</Eyebrow>
+          <nav className="flex flex-wrap gap-(--space-5) text-xs uppercase tracking-label text-muted">
+            {navLinks.map((link) => (
+              <Link key={link.href} href={link.href} className="hover:text-heading">
+                {link.label}
+              </Link>
+            ))}
+          </nav>
+          <form action={signOut}>
+            <button type="submit" className="text-xs uppercase tracking-label text-muted focus-ring hover:text-heading">
+              Déconnexion →
+            </button>
+          </form>
+        </header>
+        {children}
+      </div>
     </div>
   );
 }

@@ -106,7 +106,7 @@ export default async function CartePage({ searchParams }: { searchParams: Promis
       <Eyebrow>Carte</Eyebrow>
       <h1 className="mt-(--space-2) text-display-sm">Tracés GPS</h1>
 
-      <form method="get" className="mt-(--space-6) flex flex-wrap items-end gap-(--space-4) border border-line p-(--space-4)">
+      <form method="get" className="mt-(--space-6) flex flex-wrap items-end gap-(--space-4) border border-divider p-(--space-4)">
         <TextField label="Du" name="from" type="date" defaultValue={from} />
         <TextField label="Au" name="to" type="date" defaultValue={to} />
         <SelectField label="Ville" name="city_id" defaultValue={cityId}>
@@ -130,7 +130,7 @@ export default async function CartePage({ searchParams }: { searchParams: Promis
         </Button>
       </form>
 
-      <p className="mt-(--space-4) text-xs text-charcoal/60">
+      <p className="mt-(--space-4) text-xs text-muted">
         {tracks.length} segment{tracks.length > 1 ? "s" : ""} tracé{tracks.length > 1 ? "s" : ""}
         {dumps.length > 0 ? ` · ${dumps.length} dépôt${dumps.length > 1 ? "s" : ""} sauvage${dumps.length > 1 ? "s" : ""} signalé${dumps.length > 1 ? "s" : ""}` : ""}{" "}
         sur la période.

@@ -291,5 +291,5 @@ export function TrackMap({ tracks, dumps = [] }: { tracks: TrackFeature[]; dumps
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dumps]);
 
-  return <div ref={containerRef} className="h-[520px] w-full border border-line" />;
+  return <div ref={containerRef} className="h-[520px] w-full border border-divider" />;
 }

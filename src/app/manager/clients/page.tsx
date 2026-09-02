@@ -18,11 +18,11 @@ export default async function ClientsPage() {
 
       <div className="mt-(--space-6) flex flex-col">
         {((clients ?? []) as Client[]).map((client) => (
-          <div key={client.id} className="border-t border-line py-(--space-3) text-sm text-black last:border-b">
+          <div key={client.id} className="border-t border-divider py-(--space-3) text-sm text-heading last:border-b">
             {client.name}
           </div>
         ))}
-        {(clients ?? []).length === 0 ? <p className="py-(--space-3) text-sm text-charcoal/60">Aucun client.</p> : null}
+        {(clients ?? []).length === 0 ? <p className="py-(--space-3) text-sm text-muted">Aucun client.</p> : null}
       </div>
     </div>
   );

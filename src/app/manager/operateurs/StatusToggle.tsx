@@ -13,7 +13,7 @@ export function StatusToggle({ operatorId, status }: { operatorId: string; statu
       type="button"
       disabled={pending}
       onClick={() => startTransition(() => setOperatorStatus(operatorId, next))}
-      className="text-xs uppercase tracking-label text-charcoal/60 underline decoration-line underline-offset-2 focus-ring disabled:opacity-40"
+      className="text-xs uppercase tracking-label text-muted underline decoration-divider underline-offset-2 focus-ring disabled:opacity-40"
     >
       {status === "active" ? "Désactiver" : "Réactiver"}
     </button>

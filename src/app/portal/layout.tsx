@@ -9,10 +9,10 @@ export default async function PortalLayout({ children }: { children: React.React
   if (appUser.role !== "client" && appUser.role !== "city") redirect(roleHome(appUser.role));
 
   return (
-    <div>
+    <div data-theme="dark" className="min-h-screen bg-page text-body">
       <div className="flex justify-end px-(--gutter) pt-(--space-4)">
         <form action={signOut}>
-          <button type="submit" className="text-xs uppercase tracking-label text-charcoal/60 focus-ring hover:text-black">
+          <button type="submit" className="text-xs uppercase tracking-label text-muted focus-ring hover:text-heading">
             Déconnexion →
           </button>
         </form>

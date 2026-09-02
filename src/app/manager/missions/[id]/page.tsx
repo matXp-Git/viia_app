@@ -136,29 +136,29 @@ export default async function ManagerMissionDetailPage({ params }: { params: Pro
       <div className="mt-(--space-2) flex flex-wrap items-center justify-between gap-(--space-3)">
         <div>
           <h1 className="text-display-sm">{typedMission.reference ?? "—"}</h1>
-          <p className="mt-1 text-sm text-charcoal/60">
+          <p className="mt-1 text-sm text-muted">
             {typedMission.city?.name ?? "?"} {typedMission.client ? `· ${typedMission.client.name}` : ""} ·{" "}
             {typedMission.date}
           </p>
         </div>
         <MissionStatusBadge status={typedMission.status} />
       </div>
-      <Link href="/manager" className="mt-(--space-2) inline-block text-xs uppercase tracking-label text-charcoal/60 hover:text-black">
+      <Link href="/manager" className="mt-(--space-2) inline-block text-xs uppercase tracking-label text-muted hover:text-heading">
         ← Retour aux missions
       </Link>
 
-      <div className="mt-(--space-7) grid grid-cols-3 gap-px border border-line bg-line mobile:grid-cols-1">
-        <div className="bg-white p-(--space-4)">
-          <div className="text-2xs uppercase text-charcoal/60">Total collecté</div>
-          <div className="mt-(--space-2) text-sm font-bold text-black">{missionKilosTotal.toFixed(1)} kg</div>
+      <div className="mt-(--space-7) grid grid-cols-3 gap-px border border-divider bg-divider mobile:grid-cols-1">
+        <div className="bg-surface p-(--space-4)">
+          <div className="text-2xs uppercase text-muted">Total collecté</div>
+          <div className="mt-(--space-2) text-sm font-bold text-heading">{missionKilosTotal.toFixed(1)} kg</div>
         </div>
-        <div className="bg-white p-(--space-4)">
-          <div className="text-2xs uppercase text-charcoal/60">Dont recyclé</div>
-          <div className="mt-(--space-2) text-sm font-bold text-black">{missionKilosRecycled.toFixed(1)} kg</div>
+        <div className="bg-surface p-(--space-4)">
+          <div className="text-2xs uppercase text-muted">Dont recyclé</div>
+          <div className="mt-(--space-2) text-sm font-bold text-heading">{missionKilosRecycled.toFixed(1)} kg</div>
         </div>
-        <div className="bg-white p-(--space-4)">
-          <div className="text-2xs uppercase text-charcoal/60">Taux de recyclage</div>
-          <div className="mt-(--space-2) text-sm font-bold text-black">{recyclingRate !== null ? `${recyclingRate}%` : "—"}</div>
+        <div className="bg-surface p-(--space-4)">
+          <div className="text-2xs uppercase text-muted">Taux de recyclage</div>
+          <div className="mt-(--space-2) text-sm font-bold text-heading">{recyclingRate !== null ? `${recyclingRate}%` : "—"}</div>
         </div>
       </div>
 
@@ -175,26 +175,26 @@ export default async function ManagerMissionDetailPage({ params }: { params: Pro
           {[...summaryByOperator.entries()].map(([operatorId, summary]) => (
             <div
               key={operatorId}
-              className="flex flex-wrap items-center justify-between gap-(--space-4) border-t border-line py-(--space-3) last:border-b"
+              className="flex flex-wrap items-center justify-between gap-(--space-4) border-t border-divider py-(--space-3) last:border-b"
             >
               <div>
-                <div className="text-sm text-black">{summary.operator?.name ?? "?"}</div>
-                <div className="mt-1 text-xs text-charcoal/60">
+                <div className="text-sm text-heading">{summary.operator?.name ?? "?"}</div>
+                <div className="mt-1 text-xs text-muted">
                   {summary.sessions} session{summary.sessions > 1 ? "s" : ""}
                   {summary.firstActivity ? ` · du ${new Date(summary.firstActivity).toLocaleDateString("fr-FR")}` : ""}
                   {summary.lastActivity ? ` au ${new Date(summary.lastActivity).toLocaleDateString("fr-FR")}` : ""}
                   {summary.durationMs > 0 ? ` · ${formatDuration(summary.durationMs)} de suivi` : ""}
                 </div>
               </div>
-              <div className="text-sm font-bold text-black">
+              <div className="text-sm font-bold text-heading">
                 {summary.kilosTotal.toFixed(1)} kg
-                <span className="ml-(--space-2) text-xs font-normal text-charcoal/60">
+                <span className="ml-(--space-2) text-xs font-normal text-muted">
                   ({summary.kilosRecycled.toFixed(1)} kg recyclé)
                 </span>
               </div>
             </div>
           ))}
-          {summaryByOperator.size === 0 ? <p className="py-(--space-3) text-sm text-charcoal/60">Aucun opérateur affecté.</p> : null}
+          {summaryByOperator.size === 0 ? <p className="py-(--space-3) text-sm text-muted">Aucun opérateur affecté.</p> : null}
         </div>
       </div>
 
@@ -204,16 +204,16 @@ export default async function ManagerMissionDetailPage({ params }: { params: Pro
           {typedDumps.map((dump) => {
             const operatorName = operators.find((a) => a.operator_id === dump.operator_id)?.operator?.name ?? "?";
             return (
-              <div key={dump.id} className="flex flex-wrap items-center justify-between gap-(--space-4) border-t border-line py-(--space-3) last:border-b text-sm">
-                <span className="text-black">{operatorName}</span>
-                <span className="text-xs text-charcoal/60">{new Date(dump.reported_at).toLocaleString("fr-FR")}</span>
-                <span className="text-xs text-charcoal/60">
+              <div key={dump.id} className="flex flex-wrap items-center justify-between gap-(--space-4) border-t border-divider py-(--space-3) last:border-b text-sm">
+                <span className="text-heading">{operatorName}</span>
+                <span className="text-xs text-muted">{new Date(dump.reported_at).toLocaleString("fr-FR")}</span>
+                <span className="text-xs text-muted">
                   {dump.lat.toFixed(5)}, {dump.lng.toFixed(5)}
                 </span>
               </div>
             );
           })}
-          {typedDumps.length === 0 ? <p className="py-(--space-3) text-sm text-charcoal/60">Aucun signalement.</p> : null}
+          {typedDumps.length === 0 ? <p className="py-(--space-3) text-sm text-muted">Aucun signalement.</p> : null}
         </div>
       </div>
     </div>

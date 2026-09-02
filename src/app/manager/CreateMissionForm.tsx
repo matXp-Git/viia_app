@@ -18,7 +18,7 @@ export function CreateMissionForm({ cities, clients, action }: Props) {
   const [state, formAction, pending] = useActionState(action, initialState);
 
   return (
-    <form action={formAction} className="flex flex-wrap items-end gap-(--space-4) border border-line p-(--space-4)">
+    <form action={formAction} className="flex flex-wrap items-end gap-(--space-4) border border-divider p-(--space-4)">
       <SelectField label="Ville" name="city_id" required defaultValue="">
         <option value="" disabled>
           Choisir...
