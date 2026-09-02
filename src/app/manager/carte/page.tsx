@@ -80,13 +80,11 @@ export default async function CartePage({ searchParams }: { searchParams: Promis
   }
 
   let dumps: DumpFeature[] = [];
-  let dumpDebug = "";
 
   if (missionIds.length > 0) {
     let dumpQuery = supabase.from("wild_dump").select("*").in("mission_id", missionIds);
     if (operatorId) dumpQuery = dumpQuery.eq("operator_id", operatorId);
-    const { data: wildDumps, error: dumpError } = await dumpQuery;
-    dumpDebug = `missionIds=${JSON.stringify(missionIds)} rawCount=${wildDumps?.length ?? "null"} error=${dumpError?.message ?? "none"} raw=${JSON.stringify(wildDumps)}`;
+    const { data: wildDumps } = await dumpQuery;
 
     dumps = ((wildDumps ?? []) as WildDump[]).map((dump) => {
       const mission = missionById.get(dump.mission_id);
@@ -137,7 +135,6 @@ export default async function CartePage({ searchParams }: { searchParams: Promis
         {dumps.length > 0 ? ` · ${dumps.length} dépôt${dumps.length > 1 ? "s" : ""} sauvage${dumps.length > 1 ? "s" : ""} signalé${dumps.length > 1 ? "s" : ""}` : ""}{" "}
         sur la période.
       </p>
-      <p className="mt-(--space-1) break-all text-2xs text-critical">DEBUG: {dumpDebug}</p>
 
       <div className="mt-(--space-3)">
         <TrackMap tracks={tracks} dumps={dumps} />
