@@ -186,7 +186,7 @@ export function MissionRunner({ missionId, reference, cityName, clientName, date
               variant="ghost"
               onClick={handleWildDump}
               disabled={wildDumpPending}
-              className="!border-warning !text-warning"
+              className="!border-critical !text-critical"
             >
               {wildDumpPending ? "Localisation..." : "Dépôt sauvage"}
             </Button>

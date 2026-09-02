@@ -116,6 +116,16 @@ function boostRoadContrast(map: MapLibreMap) {
   for (const [id, alpha] of textOverrides) {
     if (map.getLayer(id)) map.setPaintProperty(id, "text-color", tokenToRgba("--color-white", alpha));
   }
+
+  // highway_name_other ships with a 1px solid black halo — sized for the
+  // style's original near-invisible grey label text, where it helped
+  // separate letters from whatever's underneath. Now that the text itself
+  // is bright, that same halo reads as a heavy dark outline that blurs the
+  // thin letterforms instead of helping. Drop it now that the text alone
+  // has enough contrast.
+  if (map.getLayer("highway_name_other")) {
+    map.setPaintProperty("highway_name_other", "text-halo-width", 0);
+  }
 }
 
 function toTrackCollection(tracks: TrackFeature[]): FeatureCollectionOf<TrackLineFeature> {
@@ -199,7 +209,7 @@ export function TrackMap({ tracks, dumps = [] }: { tracks: TrackFeature[]; dumps
         source: "dumps",
         paint: {
           "circle-radius": 7,
-          "circle-color": resolveToken("--color-warning"),
+          "circle-color": resolveToken("--color-critical"),
           "circle-stroke-width": 2,
           "circle-stroke-color": resolveToken("--color-trace-outline"),
         },
