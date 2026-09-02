@@ -26,7 +26,8 @@ export async function startSegment(missionId: string, source: TrackSource): Prom
     .single();
 
   if (error || !data) {
-    return { error: "Impossible de démarrer le segment." };
+    console.error("startSegment failed", error);
+    return { error: `Impossible de démarrer le segment. ${error?.message ?? ""} (${error?.code ?? "no data"})` };
   }
 
   revalidatePath(`/operator/missions/${missionId}`);
