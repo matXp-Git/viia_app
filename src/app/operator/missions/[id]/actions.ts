@@ -19,6 +19,16 @@ export async function startSegment(missionId: string, source: TrackSource): Prom
   const appUser = await requireOperator();
   const supabase = await createClient();
 
+  // TEMP diagnostic for the RLS 42501 investigation — remove once resolved.
+  const {
+    data: { user: authUser },
+  } = await supabase.auth.getUser();
+  const { data: selfRow, error: selfError } = await supabase
+    .from("app_user")
+    .select("id, operator_id")
+    .eq("id", appUser.id)
+    .maybeSingle();
+
   const { data, error } = await supabase
     .from("track_segment")
     .insert({ mission_id: missionId, operator_id: appUser.operator_id, source })
@@ -26,8 +36,17 @@ export async function startSegment(missionId: string, source: TrackSource): Prom
     .single();
 
   if (error || !data) {
-    console.error("startSegment failed", error);
-    return { error: `Impossible de démarrer le segment. ${error?.message ?? ""} (${error?.code ?? "no data"})` };
+    console.error("startSegment failed", {
+      error,
+      appUserId: appUser.id,
+      appUserOperatorId: appUser.operator_id,
+      authUserId: authUser?.id,
+      selfRow,
+      selfError,
+    });
+    return {
+      error: `Impossible de démarrer le segment. ${error?.message ?? ""} (${error?.code ?? "no data"}) | auth=${authUser?.id ?? "null"} appUser=${appUser.id} op=${appUser.operator_id} self=${JSON.stringify(selfRow)} selfErr=${selfError?.message ?? "none"}`,
+    };
   }
 
   revalidatePath(`/operator/missions/${missionId}`);
