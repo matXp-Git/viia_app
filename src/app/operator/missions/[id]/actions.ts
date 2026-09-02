@@ -28,6 +28,8 @@ export async function startSegment(missionId: string, source: TrackSource): Prom
     .select("id, operator_id")
     .eq("id", appUser.id)
     .maybeSingle();
+  const { data: rpcOperatorId, error: rpcError } = await supabase.rpc("app_operator_id");
+  const { data: rpcRole, error: rpcRoleError } = await supabase.rpc("app_role");
 
   const { data, error } = await supabase
     .from("track_segment")
@@ -45,7 +47,7 @@ export async function startSegment(missionId: string, source: TrackSource): Prom
       selfError,
     });
     return {
-      error: `Impossible de démarrer le segment. ${error?.message ?? ""} (${error?.code ?? "no data"}) | auth=${authUser?.id ?? "null"} appUser=${appUser.id} op=${appUser.operator_id} self=${JSON.stringify(selfRow)} selfErr=${selfError?.message ?? "none"}`,
+      error: `Impossible de démarrer le segment. ${error?.message ?? ""} (${error?.code ?? "no data"}) | auth=${authUser?.id ?? "null"} appUser=${appUser.id} op=${appUser.operator_id} self=${JSON.stringify(selfRow)} selfErr=${selfError?.message ?? "none"} rpcOp=${rpcOperatorId ?? "null"} rpcOpErr=${rpcError?.message ?? "none"} rpcRole=${rpcRole ?? "null"} rpcRoleErr=${rpcRoleError?.message ?? "none"}`,
     };
   }
 
