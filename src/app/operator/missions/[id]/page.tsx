@@ -1,8 +1,6 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getAppUser } from "@/lib/supabase/session";
-import { Eyebrow } from "@/components/ui/Eyebrow";
-import { MissionStatusBadge } from "@/components/ui/StatusBadge";
 import type { City, Client, Mission, TrackSegment, Weighing } from "@/lib/types";
 import { MissionRunner } from "./MissionRunner";
 
@@ -33,25 +31,16 @@ export default async function OperatorMissionPage({ params }: { params: Promise<
   const typedMission = mission as Mission & { city: City | null; client: Client | null };
 
   return (
-    <main className="mx-auto max-w-(--container-max) px-(--gutter) py-(--space-9)">
-      <Eyebrow>Mission</Eyebrow>
-      <div className="mt-(--space-2) flex flex-wrap items-center justify-between gap-(--space-3)">
-        <h1 className="text-display-sm">{typedMission.reference ?? "—"}</h1>
-        <MissionStatusBadge status={typedMission.status} />
-      </div>
-      <p className="mt-(--space-2) text-sm text-charcoal/60">
-        {typedMission.city?.name ?? "?"} {typedMission.client ? `· ${typedMission.client.name}` : ""} · {typedMission.date}
-      </p>
-
-      <div className="mt-(--space-7)">
-        <MissionRunner
-          missionId={id}
-          missionStatus={typedMission.status}
-          completedAt={assignment!.completed_at}
-          latestSegment={(segments?.[0] as TrackSegment | undefined) ?? null}
-          weighing={(weighing as Weighing | null) ?? null}
-        />
-      </div>
-    </main>
+    <MissionRunner
+      missionId={id}
+      reference={typedMission.reference ?? "—"}
+      cityName={typedMission.city?.name ?? "?"}
+      clientName={typedMission.client?.name ?? null}
+      date={typedMission.date}
+      missionStatus={typedMission.status}
+      completedAt={assignment!.completed_at}
+      latestSegment={(segments?.[0] as TrackSegment | undefined) ?? null}
+      weighing={(weighing as Weighing | null) ?? null}
+    />
   );
 }

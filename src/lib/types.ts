@@ -51,6 +51,16 @@ export type Weighing = {
   recorded_at: string;
 };
 
+export type WildDump = {
+  id: string;
+  mission_id: string;
+  operator_id: string;
+  lat: number;
+  lng: number;
+  note: string | null;
+  reported_at: string;
+};
+
 export type AppUser = {
   id: string;
   role: Role;

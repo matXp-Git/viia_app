@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
-import type { City, Mission, Operator, TrackSegment } from "@/lib/types";
+import type { City, Mission, Operator, TrackSegment, WildDump } from "@/lib/types";
 import { Eyebrow } from "@/components/ui/Eyebrow";
-import { TrackMap, type TrackFeature } from "@/components/map/TrackMap";
+import { TrackMap, type TrackFeature, type DumpFeature } from "@/components/map/TrackMap";
 import { SelectField, TextField } from "@/components/ui/Field";
 import { Button } from "@/components/ui/Button";
 
@@ -79,6 +79,28 @@ export default async function CartePage({ searchParams }: { searchParams: Promis
     }
   }
 
+  let dumps: DumpFeature[] = [];
+
+  if (missionIds.length > 0) {
+    let dumpQuery = supabase.from("wild_dump").select("*").in("mission_id", missionIds);
+    if (operatorId) dumpQuery = dumpQuery.eq("operator_id", operatorId);
+    const { data: wildDumps } = await dumpQuery;
+
+    dumps = ((wildDumps ?? []) as WildDump[]).map((dump) => {
+      const mission = missionById.get(dump.mission_id);
+      return {
+        properties: {
+          reference: mission?.reference ?? "—",
+          cityName: mission?.city?.name ?? "?",
+          date: mission?.date ?? "",
+          lat: dump.lat,
+          lng: dump.lng,
+        },
+        coordinate: [dump.lng, dump.lat] as [number, number],
+      };
+    });
+  }
+
   return (
     <div>
       <Eyebrow>Carte</Eyebrow>
@@ -109,11 +131,13 @@ export default async function CartePage({ searchParams }: { searchParams: Promis
       </form>
 
       <p className="mt-(--space-4) text-xs text-charcoal/60">
-        {tracks.length} segment{tracks.length > 1 ? "s" : ""} tracé{tracks.length > 1 ? "s" : ""} sur la période.
+        {tracks.length} segment{tracks.length > 1 ? "s" : ""} tracé{tracks.length > 1 ? "s" : ""}
+        {dumps.length > 0 ? ` · ${dumps.length} dépôt${dumps.length > 1 ? "s" : ""} sauvage${dumps.length > 1 ? "s" : ""} signalé${dumps.length > 1 ? "s" : ""}` : ""}{" "}
+        sur la période.
       </p>
 
       <div className="mt-(--space-3)">
-        <TrackMap tracks={tracks} />
+        <TrackMap tracks={tracks} dumps={dumps} />
       </div>
     </div>
   );

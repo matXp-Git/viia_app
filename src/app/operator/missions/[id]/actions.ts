@@ -73,6 +73,22 @@ export async function submitWeighing(
   return { success: true };
 }
 
+export async function reportWildDump(missionId: string, lat: number, lng: number): Promise<ActionResult> {
+  const appUser = await requireOperator();
+  const supabase = await createClient();
+
+  const { error } = await supabase
+    .from("wild_dump")
+    .insert({ mission_id: missionId, operator_id: appUser.operator_id, lat, lng });
+
+  if (error) {
+    return { error: "Impossible d'enregistrer le dépôt sauvage." };
+  }
+
+  revalidatePath(`/operator/missions/${missionId}`);
+  return {};
+}
+
 export async function completeAssignment(missionId: string): Promise<ActionResult> {
   const appUser = await requireOperator();
   const supabase = await createClient();

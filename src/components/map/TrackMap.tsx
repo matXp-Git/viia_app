@@ -33,16 +33,32 @@ export type TrackFeature = {
   coordinates: [number, number][];
 };
 
+export type DumpFeatureProps = {
+  reference: string;
+  cityName: string;
+  date: string;
+  lat: number;
+  lng: number;
+};
+
+export type DumpFeature = {
+  properties: DumpFeatureProps;
+  coordinate: [number, number];
+};
+
 type TrackLineFeature = {
   type: "Feature";
   properties: TrackFeatureProps;
   geometry: { type: "LineString"; coordinates: [number, number][] };
 };
 
-type TrackFeatureCollection = {
-  type: "FeatureCollection";
-  features: TrackLineFeature[];
+type DumpPointFeature = {
+  type: "Feature";
+  properties: DumpFeatureProps;
+  geometry: { type: "Point"; coordinates: [number, number] };
 };
+
+type FeatureCollectionOf<F> = { type: "FeatureCollection"; features: F[] };
 
 // Default view when there's nothing to show yet — Lambersart, the spec's
 // own example city, rather than an arbitrary world view.
@@ -54,7 +70,7 @@ function resolveToken(name: string): string {
   return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 }
 
-function toFeatureCollection(tracks: TrackFeature[]): TrackFeatureCollection {
+function toTrackCollection(tracks: TrackFeature[]): FeatureCollectionOf<TrackLineFeature> {
   return {
     type: "FeatureCollection",
     features: tracks
@@ -67,7 +83,18 @@ function toFeatureCollection(tracks: TrackFeature[]): TrackFeatureCollection {
   };
 }
 
-export function TrackMap({ tracks }: { tracks: TrackFeature[] }) {
+function toDumpCollection(dumps: DumpFeature[]): FeatureCollectionOf<DumpPointFeature> {
+  return {
+    type: "FeatureCollection",
+    features: dumps.map((d) => ({
+      type: "Feature",
+      properties: d.properties,
+      geometry: { type: "Point", coordinates: d.coordinate },
+    })),
+  };
+}
+
+export function TrackMap({ tracks, dumps = [] }: { tracks: TrackFeature[]; dumps?: DumpFeature[] }) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
 
@@ -87,7 +114,8 @@ export function TrackMap({ tracks }: { tracks: TrackFeature[] }) {
     const popup = new Popup({ closeButton: false, offset: 12 });
 
     map.on("load", () => {
-      map.addSource("tracks", { type: "geojson", data: toFeatureCollection(tracks) });
+      map.addSource("tracks", { type: "geojson", data: toTrackCollection(tracks) });
+      map.addSource("dumps", { type: "geojson", data: toDumpCollection(dumps) });
 
       map.addLayer({
         id: "tracks-outline",
@@ -111,10 +139,24 @@ export function TrackMap({ tracks }: { tracks: TrackFeature[] }) {
         },
       });
 
-      map.on("mouseenter", "tracks-line", () => {
+      map.addLayer({
+        id: "dumps-point",
+        type: "circle",
+        source: "dumps",
+        paint: {
+          "circle-radius": 7,
+          "circle-color": resolveToken("--color-warning"),
+          "circle-stroke-width": 2,
+          "circle-stroke-color": resolveToken("--color-trace-outline"),
+        },
+      });
+
+      const clickableLayers = ["tracks-line", "dumps-point"];
+
+      map.on("mouseenter", clickableLayers, () => {
         map.getCanvas().style.cursor = "pointer";
       });
-      map.on("mouseleave", "tracks-line", () => {
+      map.on("mouseleave", clickableLayers, () => {
         map.getCanvas().style.cursor = "";
         popup.remove();
       });
@@ -129,14 +171,42 @@ export function TrackMap({ tracks }: { tracks: TrackFeature[] }) {
           )
           .addTo(map);
       });
+      map.on("click", "dumps-point", (event: MapLayerMouseEvent) => {
+        const feature = event.features?.[0];
+        if (!feature) return;
+        const props = feature.properties as DumpFeatureProps;
+        popup
+          .setLngLat(event.lngLat)
+          .setHTML(
+            `<strong>Dépôt sauvage</strong><br/>${props.reference} · ${props.cityName} · ${props.date}<br/>${props.lat.toFixed(5)}, ${props.lng.toFixed(5)}`,
+          )
+          .addTo(map);
+      });
     });
 
     return () => {
       map.remove();
       mapRef.current = null;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- the map is built once; data updates are pushed via the effect below
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- the map is built once; data updates are pushed via the effects below
   }, []);
+
+  function fitToData(map: MapLibreMap) {
+    const trackSource = map.getSource("tracks") as GeoJSONSource | undefined;
+    const dumpSource = map.getSource("dumps") as GeoJSONSource | undefined;
+    if (!trackSource || !dumpSource) return;
+
+    const trackCoords = toTrackCollection(tracks).features.flatMap((f) => f.geometry.coordinates);
+    const dumpCoords = toDumpCollection(dumps).features.map((f) => f.geometry.coordinates);
+    const allCoords = [...trackCoords, ...dumpCoords];
+    if (allCoords.length === 0) return;
+
+    const bounds = allCoords.reduce(
+      (b: LngLatBounds, c: [number, number]) => b.extend(c),
+      new LngLatBounds(allCoords[0], allCoords[0]),
+    );
+    map.fitBounds(bounds as LngLatBoundsLike, { padding: 48, maxZoom: 16, duration: 0 });
+  }
 
   useEffect(() => {
     const map = mapRef.current;
@@ -145,22 +215,31 @@ export function TrackMap({ tracks }: { tracks: TrackFeature[] }) {
     const apply = () => {
       const source = map.getSource("tracks") as GeoJSONSource | undefined;
       if (!source) return;
-      const collection = toFeatureCollection(tracks);
+      const collection = toTrackCollection(tracks);
       source.setData(collection);
-
-      const coords = collection.features.flatMap((f: TrackLineFeature) => f.geometry.coordinates);
-      if (coords.length > 0) {
-        const bounds = coords.reduce(
-          (b: LngLatBounds, c: [number, number]) => b.extend(c),
-          new LngLatBounds(coords[0], coords[0]),
-        );
-        map.fitBounds(bounds as LngLatBoundsLike, { padding: 48, maxZoom: 16, duration: 0 });
-      }
+      fitToData(map);
     };
 
     if (map.isStyleLoaded()) apply();
     else map.once("load", apply);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tracks]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+
+    const apply = () => {
+      const source = map.getSource("dumps") as GeoJSONSource | undefined;
+      if (!source) return;
+      source.setData(toDumpCollection(dumps));
+      fitToData(map);
+    };
+
+    if (map.isStyleLoaded()) apply();
+    else map.once("load", apply);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dumps]);
 
   return <div ref={containerRef} className="h-[520px] w-full border border-line" />;
 }
