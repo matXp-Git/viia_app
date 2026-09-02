@@ -151,3 +151,39 @@ a {
   border-color: var(--color-heading);
   box-shadow: var(--focus-ring);
 }
+
+/* Map popups (TrackMap): fixed appearance on purpose, not driven by
+   --color-page/--color-body. They float over the map itself (which is
+   always dark, whichever page it's embedded in), and their DOM sits inside
+   whatever theme wrapper the page uses — without an explicit color here
+   they'd inherit that page's text color onto MapLibre's own always-white
+   popup background (white-on-white on manager/portal's dark pages). Brand
+   tokens, not semantic ones, since this shouldn't flip with the theme. */
+.viia-popup .maplibregl-popup-content {
+  background: var(--color-white);
+  color: var(--color-charcoal);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3) var(--space-4);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  line-height: var(--leading-snug);
+  box-shadow: none;
+}
+
+.viia-popup .maplibregl-popup-content strong {
+  color: var(--color-black);
+}
+
+.viia-popup.maplibregl-popup-anchor-bottom .maplibregl-popup-tip {
+  border-top-color: var(--color-white);
+}
+.viia-popup.maplibregl-popup-anchor-top .maplibregl-popup-tip {
+  border-bottom-color: var(--color-white);
+}
+.viia-popup.maplibregl-popup-anchor-left .maplibregl-popup-tip {
+  border-right-color: var(--color-white);
+}
+.viia-popup.maplibregl-popup-anchor-right .maplibregl-popup-tip {
+  border-left-color: var(--color-white);
+}

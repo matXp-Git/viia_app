@@ -159,7 +159,11 @@ export function TrackMap({ tracks, dumps = [] }: { tracks: TrackFeature[]; dumps
     mapRef.current = map;
     map.addControl(new NavigationControl({ showCompass: false }), "top-right");
 
-    const popup = new Popup({ closeButton: false, offset: 12 });
+    // Fixed appearance regardless of the surrounding page theme — see
+    // .viia-popup in globals.css. Without it the popup inherits whatever
+    // text color the current theme sets (white on manager/portal's dark
+    // pages) onto MapLibre's own always-white popup background.
+    const popup = new Popup({ closeButton: false, offset: 12, className: "viia-popup" });
 
     map.on("load", () => {
       boostRoadContrast(map);
