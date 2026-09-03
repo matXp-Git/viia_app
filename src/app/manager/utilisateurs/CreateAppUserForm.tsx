@@ -20,6 +20,7 @@ const roleLabel: Record<Role, string> = {
   manager: "Manager",
   client: "Client",
   city: "Ville",
+  commercial: "Commercial",
 };
 
 export function CreateAppUserForm({ operators, clients, cities }: Props) {

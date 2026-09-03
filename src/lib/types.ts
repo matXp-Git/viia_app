@@ -60,6 +60,20 @@ export type WildDump = {
   reported_at: string;
 };
 
+export type Density = "faible" | "moyen" | "fort";
+
+export type Releve = {
+  id: string;
+  client_id: string | null;
+  city_id: string;
+  troncon: string;
+  length_m: number;
+  count_aller: number;
+  count_retour: number;
+  density: Density;
+  recorded_at: string;
+};
+
 export type AppUser = {
   id: string;
   role: Role;

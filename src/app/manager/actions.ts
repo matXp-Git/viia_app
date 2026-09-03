@@ -208,7 +208,7 @@ export async function createAppUser(_prevState: FormState, formData: FormData): 
   if (!authUserId || !role) {
     return { error: "Identifiant utilisateur et rôle requis." };
   }
-  if (role !== "manager" && !scopeId) {
+  if (role !== "manager" && role !== "commercial" && !scopeId) {
     return { error: "Ce rôle nécessite de sélectionner l'entité associée." };
   }
 
@@ -240,7 +240,7 @@ export async function updateAppUser(userId: string, _prevState: FormState, formD
   if (!role) {
     return { error: "Rôle requis." };
   }
-  if (role !== "manager" && !scopeId) {
+  if (role !== "manager" && role !== "commercial" && !scopeId) {
     return { error: "Ce rôle nécessite de sélectionner l'entité associée." };
   }
 

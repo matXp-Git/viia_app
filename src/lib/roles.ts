@@ -1,4 +1,4 @@
-export type Role = "operator" | "manager" | "client" | "city";
+export type Role = "operator" | "manager" | "client" | "city" | "commercial";
 
 export function roleHome(role: Role): string {
   switch (role) {
@@ -9,5 +9,7 @@ export function roleHome(role: Role): string {
     case "client":
     case "city":
       return "/portal";
+    case "commercial":
+      return "/releves";
   }
 }

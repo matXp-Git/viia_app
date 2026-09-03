@@ -13,6 +13,7 @@ const navLinks = [
   { href: "/manager/operateurs", label: "Opérateurs" },
   { href: "/manager/clients", label: "Clients" },
   { href: "/manager/utilisateurs", label: "Utilisateurs" },
+  { href: "/releves", label: "Relevés" },
 ];
 
 export default async function ManagerLayout({ children }: { children: React.ReactNode }) {
