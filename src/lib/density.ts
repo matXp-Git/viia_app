@@ -23,3 +23,11 @@ export const densityLabel: Record<Density, string> = {
   moyen: "Fort",
   fort: "Intense",
 };
+
+// Poids moyen constaté par déchet, fourni par le commercial — utilisé pour
+// donner un ordre de grandeur en kilos à partir d'un simple comptage.
+const AVG_WEIGHT_G_PER_UNIT = 8.5;
+
+export function estimatedWeightKg(totalUnits: number): number {
+  return (totalUnits * AVG_WEIGHT_G_PER_UNIT) / 1000;
+}

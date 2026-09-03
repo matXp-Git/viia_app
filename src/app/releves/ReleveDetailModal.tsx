@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import type { Releve } from "@/lib/types";
-import { densityLabel, densityPerMeter } from "@/lib/density";
+import { densityLabel, densityPerMeter, estimatedWeightKg } from "@/lib/density";
 import { ReportCardGrid } from "@/components/ui/ReportCardGrid";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { Button } from "@/components/ui/Button";
@@ -10,17 +10,17 @@ import { Logo } from "@/components/ui/Logo";
 
 type Props = {
   releve: Releve;
-  clientName: string;
   cityName: string;
   onClose: () => void;
 };
 
-export function ReleveDetailModal({ releve, clientName, cityName, onClose }: Props) {
+export function ReleveDetailModal({ releve, cityName, onClose }: Props) {
   const cardRef = useRef<HTMLDivElement>(null);
   const [exporting, setExporting] = useState(false);
   const [exportError, setExportError] = useState<string | null>(null);
 
   const perMeter = densityPerMeter(releve.count_aller, releve.count_retour, releve.length_m);
+  const totalDechets = releve.count_aller + releve.count_retour;
 
   async function handleExport() {
     if (!cardRef.current) return;
@@ -56,11 +56,8 @@ export function ReleveDetailModal({ releve, clientName, cityName, onClose }: Pro
           </div>
 
           <div>
-            <div className="text-2xs uppercase tracking-label text-muted">
-              {cityName}
-              {clientName ? ` — ${clientName}` : ""}
-            </div>
-            <h2 className="mt-(--space-1) text-display-sm text-heading">{releve.troncon}</h2>
+            <div className="text-2xs uppercase tracking-label text-muted">{cityName}</div>
+            <h2 className="mt-(--space-1) text-xl text-heading">{releve.troncon}</h2>
           </div>
 
           <ReportCardGrid
@@ -69,13 +66,10 @@ export function ReleveDetailModal({ releve, clientName, cityName, onClose }: Pro
             cells={[
               { label: "Date", value: new Date(releve.recorded_at).toLocaleDateString("fr-FR") },
               { label: "Longueur", value: `${releve.length_m.toLocaleString("fr-FR")} m` },
-              {
-                label: "Total déchets",
-                value: String(releve.count_aller + releve.count_retour),
-                emphasis: true,
-              },
+              { label: "Total déchets", value: String(totalDechets), emphasis: true },
               { label: "Déchets / m", value: perMeter !== null ? perMeter.toFixed(2) : "—" },
               { label: "Densité", value: densityLabel[releve.density] },
+              { label: "Poids estimé", value: `${estimatedWeightKg(totalDechets).toLocaleString("fr-FR", { maximumFractionDigits: 1 })} kg` },
             ]}
           />
         </div>

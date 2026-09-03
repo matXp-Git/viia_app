@@ -92,7 +92,6 @@ export function ReleveTable({ releves, cities, clients }: Props) {
         <ReleveDetailModal
           releve={selected}
           cityName={cityById.get(selected.city_id)?.name ?? "?"}
-          clientName={selected.client_id ? (clientById.get(selected.client_id)?.name ?? "") : ""}
           onClose={() => setSelected(null)}
         />
       ) : null}
