@@ -3,6 +3,7 @@
 import { useActionState, useEffect, useRef, useState, useTransition } from "react";
 import { Button } from "@/components/ui/Button";
 import { TextField } from "@/components/ui/Field";
+import { LivePulse } from "@/components/ui/LivePulse";
 import { recordPoint, reportWildDump, startSegment, submitWeighing, type WeighingState } from "./actions";
 
 // GPS points every 4s (spec: 3-5s), points with worse than 50m accuracy are
@@ -22,13 +23,18 @@ const weighingInitial: WeighingState = {};
 
 const geolocationSupported = typeof navigator !== "undefined" && "geolocation" in navigator;
 
-function LivePulse() {
-  return (
-    <span className="relative flex h-6 w-6">
-      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-75" />
-      <span className="relative inline-flex h-6 w-6 rounded-full bg-accent" />
-    </span>
-  );
+// Formats from absolute timestamps, recomputed every tick, on purpose: a
+// naive "+1s per tick" counter would drift or freeze while the tab/screen
+// is backgrounded (browsers throttle timers there) and never catch back up.
+// Diffing against the stored start time self-corrects the moment the next
+// tick actually runs, whenever that is.
+function formatElapsed(ms: number): string {
+  const totalSeconds = Math.max(0, Math.floor(ms / 1000));
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+  const pad = (n: number) => n.toString().padStart(2, "0");
+  return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
 }
 
 export function MissionRunner({ missionId, reference, cityName, clientName, date }: Props) {
@@ -48,6 +54,25 @@ export function MissionRunner({ missionId, reference, cityName, clientName, date
     submitWeighing.bind(null, missionId),
     weighingInitial,
   );
+
+  // Chronometer: elapsed = now - start - (completed pause time) - (ongoing
+  // pause, if any). Pausing freezes the display without resetting it.
+  const [segmentStartedAt, setSegmentStartedAt] = useState<number | null>(null);
+  const [pausedMs, setPausedMs] = useState(0);
+  const [pauseStartedAt, setPauseStartedAt] = useState<number | null>(null);
+  const [elapsedMs, setElapsedMs] = useState(0);
+
+  useEffect(() => {
+    if (!segmentStartedAt) return;
+    const tick = () => {
+      const now = Date.now();
+      const ongoingPause = pauseStartedAt ? now - pauseStartedAt : 0;
+      setElapsedMs(now - segmentStartedAt - pausedMs - ongoingPause);
+    };
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, [segmentStartedAt, pausedMs, pauseStartedAt]);
 
   const lastPositionRef = useRef<GeolocationPosition | null>(null);
 
@@ -92,6 +117,9 @@ export function MissionRunner({ missionId, reference, cityName, clientName, date
       if (result.segmentId) {
         setActiveSegmentId(result.segmentId);
         setTracking(true);
+        // Only the first segment of a session starts the clock — "Segment
+        // manuel" also goes through here mid-session and must not reset it.
+        setSegmentStartedAt((prev) => prev ?? Date.now());
       }
     });
   }
@@ -125,10 +153,25 @@ export function MissionRunner({ missionId, reference, cityName, clientName, date
     );
   }
 
+  function handlePause() {
+    setTracking(false);
+    setPauseStartedAt(Date.now());
+  }
+
+  function handleResume() {
+    setPausedMs((prev) => prev + (pauseStartedAt ? Date.now() - pauseStartedAt : 0));
+    setPauseStartedAt(null);
+    setTracking(true);
+  }
+
   function handleEndSession() {
     setActiveSegmentId(null);
     setTracking(true);
     setConfirmingEnd(false);
+    setSegmentStartedAt(null);
+    setPausedMs(0);
+    setPauseStartedAt(null);
+    setElapsedMs(0);
   }
 
   const missionMeta = `${cityName}${clientName ? ` · ${clientName}` : ""} · ${date}`;
@@ -154,13 +197,14 @@ export function MissionRunner({ missionId, reference, cityName, clientName, date
     <main className="mx-auto flex min-h-screen max-w-[480px] flex-col px-(--gutter) py-(--space-9)">
       <div className="flex flex-col items-center text-center">
         <div className="flex items-center gap-(--space-3)">
-          {tracking ? <LivePulse /> : <span className="h-6 w-6 rounded-full border-2 border-line" />}
+          {tracking ? <LivePulse size="lg" /> : <span className="h-6 w-6 rounded-full border-2 border-line" />}
           <span className="text-xs uppercase tracking-eyebrow text-charcoal/60">
             {tracking ? "Mission en cours" : "Suivi en pause"}
           </span>
         </div>
         <h1 className="mt-(--space-4) text-display-lg">{reference}</h1>
         <p className="mt-(--space-2) text-sm text-charcoal/60">{missionMeta}</p>
+        <p className="mt-(--space-4) text-xl font-bold tabular-nums text-black">{formatElapsed(elapsedMs)}</p>
       </div>
 
       {tracking ? (
@@ -195,7 +239,7 @@ export function MissionRunner({ missionId, reference, cityName, clientName, date
           {wildDumpError ? <p className="mt-(--space-2) text-center text-xs text-critical">{wildDumpError}</p> : null}
 
           <div className="mt-(--space-7) flex flex-col items-center border-t border-line pt-(--space-6)">
-            <Button variant="accent" onClick={() => setTracking(false)}>
+            <Button variant="accent" onClick={handlePause}>
               Mettre en pause →
             </Button>
             <p className="mt-(--space-2) text-xs text-charcoal/60">
@@ -226,7 +270,7 @@ export function MissionRunner({ missionId, reference, cityName, clientName, date
                 </Button>
                 <button
                   type="button"
-                  onClick={() => setTracking(true)}
+                  onClick={handleResume}
                   className="mt-(--space-3) text-xs uppercase tracking-label text-charcoal/60 focus-ring hover:text-black"
                 >
                   Reprendre le suivi

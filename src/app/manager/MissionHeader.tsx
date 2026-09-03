@@ -7,6 +7,7 @@ import { updateMission, completeMission } from "./actions";
 import { Button } from "@/components/ui/Button";
 import { SelectField, TextField } from "@/components/ui/Field";
 import { MissionStatusBadge } from "@/components/ui/StatusBadge";
+import { LivePulse } from "@/components/ui/LivePulse";
 
 type Props = {
   mission: Mission;
@@ -14,9 +15,10 @@ type Props = {
   client: Client | null | undefined;
   cities: City[];
   clients: Client[];
+  isLive?: boolean;
 };
 
-export function MissionHeader({ mission, city, client, cities, clients }: Props) {
+export function MissionHeader({ mission, city, client, cities, clients, isLive = false }: Props) {
   const [editing, setEditing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
@@ -48,9 +50,12 @@ export function MissionHeader({ mission, city, client, cities, clients }: Props)
     return (
       <div className="flex flex-wrap items-center justify-between gap-(--space-3)">
         <div>
-          <Link href={`/manager/missions/${mission.id}`} className="text-sm font-bold text-heading underline decoration-divider underline-offset-2 hover:decoration-heading">
-            {mission.reference ?? "—"}
-          </Link>
+          <div className="flex items-center gap-(--space-2)">
+            {isLive ? <LivePulse /> : null}
+            <Link href={`/manager/missions/${mission.id}`} className="text-sm font-bold text-heading underline decoration-divider underline-offset-2 hover:decoration-heading">
+              {mission.reference ?? "—"}
+            </Link>
+          </div>
           <div className="mt-1 text-xs text-muted">
             {city?.name ?? "?"} · {client?.name ?? "Sans client"} · {mission.date}
           </div>

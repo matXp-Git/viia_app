@@ -1,10 +1,12 @@
 import { createClient } from "@/lib/supabase/server";
 import type { City, Client, Mission, Operator } from "@/lib/types";
+import { getLiveMissionIds } from "@/lib/liveActivity";
 import { createMission, updateMissionAssignments } from "./actions";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { CreateMissionForm } from "./CreateMissionForm";
 import { MissionHeader } from "./MissionHeader";
 import { Button } from "@/components/ui/Button";
+import { AutoRefresh } from "@/components/ui/AutoRefresh";
 
 export default async function ManagerMissionsPage() {
   const supabase = await createClient();
@@ -18,6 +20,9 @@ export default async function ManagerMissionsPage() {
       supabase.from("mission_assignment").select("mission_id, operator_id"),
     ]);
 
+  const inProgressIds = (missions ?? []).filter((m: Mission) => m.status === "in_progress").map((m: Mission) => m.id);
+  const liveMissionIds = await getLiveMissionIds(supabase, inProgressIds);
+
   const cityById = new Map((cities ?? []).map((c: City) => [c.id, c]));
   const clientById = new Map((clients ?? []).map((c: Client) => [c.id, c]));
   const assignedByMission = new Map<string, Set<string>>();
@@ -29,6 +34,7 @@ export default async function ManagerMissionsPage() {
 
   return (
     <div>
+      <AutoRefresh />
       <Eyebrow>Missions</Eyebrow>
       <h1 className="mt-(--space-2) text-display-sm">Missions &amp; affectations</h1>
 
@@ -51,6 +57,7 @@ export default async function ManagerMissionsPage() {
                 client={client}
                 cities={(cities ?? []) as City[]}
                 clients={(clients ?? []) as Client[]}
+                isLive={liveMissionIds.has(mission.id)}
               />
 
               <form action={boundAction} className="mt-(--space-4) border-t border-divider pt-(--space-4)">

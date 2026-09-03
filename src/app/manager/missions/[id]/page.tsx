@@ -4,6 +4,9 @@ import { createClient } from "@/lib/supabase/server";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { MissionStatusBadge } from "@/components/ui/StatusBadge";
 import { TrackMap, type TrackFeature, type DumpFeature } from "@/components/map/TrackMap";
+import { LivePulse } from "@/components/ui/LivePulse";
+import { AutoRefresh } from "@/components/ui/AutoRefresh";
+import { isRecentlyActive } from "@/lib/liveActivity";
 import type { City, Client, Mission, Operator, TrackSegment, Weighing, WildDump } from "@/lib/types";
 
 function formatDuration(ms: number): string {
@@ -102,6 +105,8 @@ export default async function ManagerMissionDetailPage({ params }: { params: Pro
     summary.kilosRecycled += Number(w.kilos_recycled);
   }
 
+  const missionIsLive = [...summaryByOperator.values()].some((s) => isRecentlyActive(s.lastActivity));
+
   const missionKilosTotal = typedWeighings.reduce((sum, w) => sum + Number(w.kilos_total), 0);
   const missionKilosRecycled = typedWeighings.reduce((sum, w) => sum + Number(w.kilos_recycled), 0);
   const recyclingRate = missionKilosTotal > 0 ? Math.round((missionKilosRecycled / missionKilosTotal) * 100) : null;
@@ -132,10 +137,14 @@ export default async function ManagerMissionDetailPage({ params }: { params: Pro
 
   return (
     <div>
+      <AutoRefresh />
       <Eyebrow>Mission</Eyebrow>
       <div className="mt-(--space-2) flex flex-wrap items-center justify-between gap-(--space-3)">
         <div>
-          <h1 className="text-display-sm">{typedMission.reference ?? "—"}</h1>
+          <div className="flex items-center gap-(--space-3)">
+            {missionIsLive ? <LivePulse /> : null}
+            <h1 className="text-display-sm">{typedMission.reference ?? "—"}</h1>
+          </div>
           <p className="mt-1 text-sm text-muted">
             {typedMission.city?.name ?? "?"} {typedMission.client ? `· ${typedMission.client.name}` : ""} ·{" "}
             {typedMission.date}
@@ -178,7 +187,10 @@ export default async function ManagerMissionDetailPage({ params }: { params: Pro
               className="flex flex-wrap items-center justify-between gap-(--space-4) border-t border-divider py-(--space-3) last:border-b"
             >
               <div>
-                <div className="text-sm text-heading">{summary.operator?.name ?? "?"}</div>
+                <div className="flex items-center gap-(--space-2) text-sm text-heading">
+                  {isRecentlyActive(summary.lastActivity) ? <LivePulse /> : null}
+                  {summary.operator?.name ?? "?"}
+                </div>
                 <div className="mt-1 text-xs text-muted">
                   {summary.sessions} session{summary.sessions > 1 ? "s" : ""}
                   {summary.firstActivity ? ` · du ${new Date(summary.firstActivity).toLocaleDateString("fr-FR")}` : ""}
