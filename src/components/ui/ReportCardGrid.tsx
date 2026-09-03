@@ -3,11 +3,19 @@ type ReportCell = {
   value: string;
 };
 
-export function ReportCardGrid({ cells }: { cells: ReportCell[] }) {
+export function ReportCardGrid({
+  cells,
+  columns,
+  className = "max-w-[420px]",
+}: {
+  cells: ReportCell[];
+  columns?: number;
+  className?: string;
+}) {
   return (
     <div
-      className="grid w-full max-w-[420px] gap-px border border-divider bg-divider max-mobile:grid-cols-1"
-      style={{ gridTemplateColumns: `repeat(${cells.length}, 1fr)` }}
+      className={`grid w-full gap-px border border-divider bg-divider max-mobile:grid-cols-1 ${className}`}
+      style={{ gridTemplateColumns: `repeat(${columns ?? cells.length}, 1fr)` }}
     >
       {cells.map((cell) => (
         <div key={cell.label} className="bg-surface p-(--space-4)">

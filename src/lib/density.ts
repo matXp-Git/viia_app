@@ -19,7 +19,7 @@ export function suggestDensity(perMeter: number | null): Density | null {
 }
 
 export const densityLabel: Record<Density, string> = {
-  faible: "Faible",
-  moyen: "Moyen",
-  fort: "Fort",
+  faible: "Moyen",
+  moyen: "Fort",
+  fort: "Intense",
 };
