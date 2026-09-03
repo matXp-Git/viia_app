@@ -15,7 +15,7 @@ export function ReportCardGrid({
 }) {
   return (
     <div
-      className={`grid w-full gap-0.5 border-2 border-divider bg-divider max-mobile:grid-cols-1 ${className}`}
+      className={`grid w-full gap-px border border-divider bg-divider max-mobile:grid-cols-1 ${className}`}
       style={{ gridTemplateColumns: `repeat(${columns ?? cells.length}, 1fr)` }}
     >
       {cells.map((cell) => (

@@ -46,10 +46,10 @@ export function ReleveDetailModal({ releve, clientName, cityName, onClose }: Pro
       onClick={onClose}
     >
       <div
-        className="flex w-full max-w-[560px] flex-col gap-(--space-5)"
+        className="flex w-full max-w-[400px] flex-col gap-(--space-5)"
         onClick={(e) => e.stopPropagation()}
       >
-        <div ref={cardRef} className="flex flex-col gap-(--space-5) bg-page p-(--space-5)">
+        <div ref={cardRef} className="flex flex-col gap-(--space-5) border border-divider bg-page p-(--space-6)">
           <div className="flex items-center justify-between">
             <Logo className="h-3.5 w-auto text-heading" />
             <Eyebrow>Relevé terrain</Eyebrow>
