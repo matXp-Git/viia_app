@@ -67,12 +67,15 @@ export function ReleveDetailModal({ releve, clientName, cityName, onClose }: Pro
             columns={3}
             className="max-w-none"
             cells={[
+              { label: "Date", value: new Date(releve.recorded_at).toLocaleDateString("fr-FR") },
               { label: "Longueur", value: `${releve.length_m.toLocaleString("fr-FR")} m` },
-              { label: "Aller", value: String(releve.count_aller) },
-              { label: "Retour", value: String(releve.count_retour) },
+              {
+                label: "Total déchets",
+                value: String(releve.count_aller + releve.count_retour),
+                emphasis: true,
+              },
               { label: "Déchets / m", value: perMeter !== null ? perMeter.toFixed(2) : "—" },
               { label: "Densité", value: densityLabel[releve.density] },
-              { label: "Date", value: new Date(releve.recorded_at).toLocaleDateString("fr-FR") },
             ]}
           />
         </div>
