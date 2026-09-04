@@ -45,10 +45,7 @@ export function ReleveDetailModal({ releve, cityName, onClose }: Props) {
       className="fixed inset-0 z-50 flex items-center justify-center bg-page/90 p-(--space-4)"
       onClick={onClose}
     >
-      <div
-        className="flex w-full max-w-[400px] flex-col gap-(--space-5)"
-        onClick={(e) => e.stopPropagation()}
-      >
+      <div className="flex w-[400px] flex-col gap-(--space-5)" onClick={(e) => e.stopPropagation()}>
         <div ref={cardRef} className="flex flex-col gap-(--space-5) border border-divider bg-page p-(--space-6)">
           <div className="flex items-center justify-between">
             <Logo className="h-3.5 w-auto text-heading" />
@@ -57,7 +54,11 @@ export function ReleveDetailModal({ releve, cityName, onClose }: Props) {
 
           <div>
             <div className="text-2xs uppercase tracking-label text-muted">{cityName}</div>
-            <h2 className="mt-(--space-1) text-xl text-heading">{releve.troncon}</h2>
+            {/* Hauteur fixe (2 lignes) — un titre court comme un titre long
+                produisent toujours une fiche de la même taille en export PNG. */}
+            <h2 className="mt-(--space-1) line-clamp-2 min-h-[3.75rem] text-xl leading-tight text-heading">
+              {releve.troncon}
+            </h2>
           </div>
 
           <ReportCardGrid
