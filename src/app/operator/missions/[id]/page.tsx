@@ -1,8 +1,18 @@
+import type { Viewport } from "next";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getAppUser } from "@/lib/supabase/session";
 import type { City, Client, Mission } from "@/lib/types";
 import { MissionRunner } from "./MissionRunner";
+
+// Support fixé sur le véhicule — un zoom accidentel pendant la conduite est
+// pire qu'utile ici. Verrouillé uniquement sur l'écran de mission.
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+};
 
 export default async function OperatorMissionPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;

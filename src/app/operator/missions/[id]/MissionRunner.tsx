@@ -74,6 +74,21 @@ export function MissionRunner({ missionId, reference, cityName, clientName, date
     return () => clearInterval(id);
   }, [segmentStartedAt, pausedMs, pauseStartedAt]);
 
+  // Le viewport meta bloque le pincer-zoomer sur la plupart des navigateurs,
+  // mais Safari iOS l'ignore et gère le pinch via ses propres événements
+  // "gesture*" — on les intercepte en plus pour couvrir ce cas.
+  useEffect(() => {
+    function preventGesture(event: Event) {
+      event.preventDefault();
+    }
+    document.addEventListener("gesturestart", preventGesture);
+    document.addEventListener("gesturechange", preventGesture);
+    return () => {
+      document.removeEventListener("gesturestart", preventGesture);
+      document.removeEventListener("gesturechange", preventGesture);
+    };
+  }, []);
+
   const lastPositionRef = useRef<GeolocationPosition | null>(null);
 
   useEffect(() => {
@@ -178,7 +193,7 @@ export function MissionRunner({ missionId, reference, cityName, clientName, date
 
   if (!activeSegmentId) {
     return (
-      <main className="mx-auto flex min-h-screen max-w-[480px] flex-col items-center justify-center px-(--gutter) text-center">
+      <main className="mx-auto flex min-h-screen max-w-[480px] touch-manipulation flex-col items-center justify-center px-(--gutter) text-center">
         <p className="text-xs tracking-eyebrow text-charcoal/60">{missionMeta}</p>
         <h1 className="mt-(--space-2) text-display-lg">{reference}</h1>
         <Button variant="accent" onClick={() => handleStart("vehicle")} disabled={pending} className="mt-(--space-7)">
@@ -194,7 +209,7 @@ export function MissionRunner({ missionId, reference, cityName, clientName, date
 
   // ---- Mission en cours — écran sobre, plein écran ----
   return (
-    <main className="mx-auto flex min-h-screen max-w-[480px] flex-col px-(--gutter) py-(--space-9)">
+    <main className="mx-auto flex min-h-screen max-w-[480px] touch-manipulation flex-col px-(--gutter) py-(--space-9)">
       <div className="flex flex-col items-center text-center">
         <div className="flex items-center gap-(--space-3)">
           {tracking ? <LivePulse size="lg" /> : <span className="h-6 w-6 rounded-full border-2 border-line" />}
