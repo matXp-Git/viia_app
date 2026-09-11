@@ -32,3 +32,9 @@ export function MissionStatusBadge({ status }: { status: MissionStatus }) {
 export function OperatorStatusBadge({ status }: { status: OperatorStatus }) {
   return <span className={`${base} ${operatorStyle[status]}`}>{operatorLabel[status]}</span>;
 }
+
+// Only rendered for kind === "releve" — a real opération is the default,
+// unmarked case, so the badge only appears on the exception worth flagging.
+export function MissionKindBadge() {
+  return <span className={`${base} border border-critical text-critical`}>Relevé</span>;
+}

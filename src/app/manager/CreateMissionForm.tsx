@@ -38,6 +38,11 @@ export function CreateMissionForm({ cities, clients, action }: Props) {
         ))}
       </SelectField>
       <TextField label="Date" name="date" type="date" required />
+      <SelectField label="Type" name="kind" defaultValue="operation">
+        <option value="operation">Opération</option>
+        <option value="releve">Relevé</option>
+      </SelectField>
+      <TextField label="Note (100 car. max)" name="note" maxLength={100} placeholder="Détail de la mission..." />
       {state.error ? <p className="w-full text-xs text-critical">{state.error}</p> : null}
       <Button type="submit" disabled={pending}>
         {pending ? "Création..." : "Créer la mission →"}

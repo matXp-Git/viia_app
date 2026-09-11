@@ -94,18 +94,28 @@ export async function createClientRecord(_prevState: FormState, formData: FormDa
 
 // ---- Missions -----------------------------------------------------------------
 
+const missionKinds = ["operation", "releve"];
+
 export async function createMission(_prevState: FormState, formData: FormData): Promise<FormState> {
   await requireManager();
   const cityId = String(formData.get("city_id") ?? "");
   const clientId = String(formData.get("client_id") ?? "") || null;
   const date = String(formData.get("date") ?? "");
+  const kind = String(formData.get("kind") ?? "operation");
+  const note = String(formData.get("note") ?? "").trim() || null;
 
   if (!cityId || !date) {
     return { error: "Ville et date requises." };
   }
+  if (!missionKinds.includes(kind)) {
+    return { error: "Type de mission invalide." };
+  }
+  if (note && note.length > 100) {
+    return { error: "Note limitée à 100 caractères." };
+  }
 
   const supabase = await createSupabaseClient();
-  const { error } = await supabase.from("mission").insert({ city_id: cityId, client_id: clientId, date });
+  const { error } = await supabase.from("mission").insert({ city_id: cityId, client_id: clientId, date, kind, note });
 
   if (error) {
     return { error: "Erreur lors de la création de la mission." };
@@ -120,9 +130,17 @@ export async function updateMission(missionId: string, _prevState: FormState, fo
   const cityId = String(formData.get("city_id") ?? "");
   const clientId = String(formData.get("client_id") ?? "") || null;
   const date = String(formData.get("date") ?? "");
+  const kind = String(formData.get("kind") ?? "operation");
+  const note = String(formData.get("note") ?? "").trim() || null;
 
   if (!cityId || !date) {
     return { error: "Ville et date requises." };
+  }
+  if (!missionKinds.includes(kind)) {
+    return { error: "Type de mission invalide." };
+  }
+  if (note && note.length > 100) {
+    return { error: "Note limitée à 100 caractères." };
   }
 
   const supabase = await createSupabaseClient();
@@ -134,7 +152,7 @@ export async function updateMission(missionId: string, _prevState: FormState, fo
 
   const { error } = await supabase
     .from("mission")
-    .update({ city_id: cityId, client_id: clientId, date })
+    .update({ city_id: cityId, client_id: clientId, date, kind, note })
     .eq("id", missionId);
 
   if (error) {

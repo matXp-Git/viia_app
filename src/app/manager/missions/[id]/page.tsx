@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { Eyebrow } from "@/components/ui/Eyebrow";
-import { MissionStatusBadge } from "@/components/ui/StatusBadge";
+import { MissionKindBadge, MissionStatusBadge } from "@/components/ui/StatusBadge";
 import { TrackMap, type TrackFeature, type DumpFeature } from "@/components/map/TrackMap";
 import { LivePulse } from "@/components/ui/LivePulse";
 import { AutoRefresh } from "@/components/ui/AutoRefresh";
@@ -144,11 +144,13 @@ export default async function ManagerMissionDetailPage({ params }: { params: Pro
           <div className="flex items-center gap-(--space-3)">
             {missionIsLive ? <LivePulse /> : null}
             <h1 className="text-display-sm">{typedMission.reference ?? "—"}</h1>
+            {typedMission.kind === "releve" ? <MissionKindBadge /> : null}
           </div>
           <p className="mt-1 text-sm text-muted">
             {typedMission.city?.name ?? "?"} {typedMission.client ? `· ${typedMission.client.name}` : ""} ·{" "}
             {typedMission.date}
           </p>
+          {typedMission.note ? <p className="mt-1 text-sm text-body">{typedMission.note}</p> : null}
         </div>
         <MissionStatusBadge status={typedMission.status} />
       </div>

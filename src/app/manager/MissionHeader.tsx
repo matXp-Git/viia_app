@@ -6,7 +6,7 @@ import type { City, Client, Mission } from "@/lib/types";
 import { updateMission, completeMission } from "./actions";
 import { Button } from "@/components/ui/Button";
 import { SelectField, TextField } from "@/components/ui/Field";
-import { MissionStatusBadge } from "@/components/ui/StatusBadge";
+import { MissionKindBadge, MissionStatusBadge } from "@/components/ui/StatusBadge";
 import { LivePulse } from "@/components/ui/LivePulse";
 
 type Props = {
@@ -55,10 +55,12 @@ export function MissionHeader({ mission, city, client, cities, clients, isLive =
             <Link href={`/manager/missions/${mission.id}`} className="text-sm font-bold text-heading underline decoration-divider underline-offset-2 hover:decoration-heading">
               {mission.reference ?? "—"}
             </Link>
+            {mission.kind === "releve" ? <MissionKindBadge /> : null}
           </div>
           <div className="mt-1 text-xs text-muted">
             {city?.name ?? "?"} · {client?.name ?? "Sans client"} · {mission.date}
           </div>
+          {mission.note ? <div className="mt-1 text-xs text-body">{mission.note}</div> : null}
         </div>
         <div className="flex items-center gap-(--space-4)">
           {canEdit ? (
@@ -104,6 +106,11 @@ export function MissionHeader({ mission, city, client, cities, clients, isLive =
         ))}
       </SelectField>
       <TextField label="Date" name="date" type="date" defaultValue={mission.date} required />
+      <SelectField label="Type" name="kind" defaultValue={mission.kind}>
+        <option value="operation">Opération</option>
+        <option value="releve">Relevé</option>
+      </SelectField>
+      <TextField label="Note (100 car. max)" name="note" maxLength={100} defaultValue={mission.note ?? ""} placeholder="Détail de la mission..." />
       {error ? <p className="w-full text-xs text-critical">{error}</p> : null}
       <Button type="submit" disabled={pending}>
         {pending ? "Enregistrement..." : "Enregistrer →"}

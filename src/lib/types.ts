@@ -1,6 +1,7 @@
 import type { Role } from "@/lib/roles";
 
 export type MissionStatus = "planned" | "in_progress" | "completed";
+export type MissionKind = "operation" | "releve";
 export type OperatorStatus = "active" | "inactive";
 export type TrackSource = "vehicle" | "manual";
 
@@ -23,6 +24,8 @@ export type Mission = {
   city_id: string;
   date: string;
   status: MissionStatus;
+  kind: MissionKind;
+  note: string | null;
   started_at: string | null;
   ended_at: string | null;
 };
