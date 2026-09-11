@@ -4,6 +4,8 @@ import { useActionState, useEffect, useRef, useState, useTransition } from "reac
 import { Button } from "@/components/ui/Button";
 import { TextField } from "@/components/ui/Field";
 import { LivePulse } from "@/components/ui/LivePulse";
+import { MissionKindBadge } from "@/components/ui/StatusBadge";
+import type { MissionKind } from "@/lib/types";
 import { recordPoint, reportWildDump, startSegment, submitWeighing, type WeighingState } from "./actions";
 
 // GPS points every 4s (spec: 3-5s), points with worse than 50m accuracy are
@@ -17,6 +19,7 @@ type Props = {
   cityName: string;
   clientName: string | null;
   date: string;
+  kind: MissionKind;
 };
 
 const weighingInitial: WeighingState = {};
@@ -37,7 +40,7 @@ function formatElapsed(ms: number): string {
   return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
 }
 
-export function MissionRunner({ missionId, reference, cityName, clientName, date }: Props) {
+export function MissionRunner({ missionId, reference, cityName, clientName, date, kind }: Props) {
   const [activeSegmentId, setActiveSegmentId] = useState<string | null>(null);
   const [tracking, setTracking] = useState(true);
   const [accuracy, setAccuracy] = useState<number | null>(null);
@@ -195,7 +198,10 @@ export function MissionRunner({ missionId, reference, cityName, clientName, date
     return (
       <main className="mx-auto flex min-h-screen max-w-[480px] touch-manipulation flex-col items-center justify-center px-(--gutter) text-center">
         <p className="text-xs tracking-eyebrow text-charcoal/60">{missionMeta}</p>
-        <h1 className="mt-(--space-2) text-display-lg">{reference}</h1>
+        <div className="mt-(--space-2) flex items-center gap-(--space-3)">
+          <h1 className="text-display-lg">{reference}</h1>
+          {kind === "releve" ? <MissionKindBadge /> : null}
+        </div>
         <Button variant="accent" onClick={() => handleStart("vehicle")} disabled={pending} className="mt-(--space-7)">
           {pending ? "Démarrage..." : "Démarrer la mission →"}
         </Button>
@@ -217,7 +223,10 @@ export function MissionRunner({ missionId, reference, cityName, clientName, date
             {tracking ? "Mission en cours" : "Suivi en pause"}
           </span>
         </div>
-        <h1 className="mt-(--space-4) text-display-lg">{reference}</h1>
+        <div className="mt-(--space-4) flex items-center gap-(--space-3)">
+          <h1 className="text-display-lg">{reference}</h1>
+          {kind === "releve" ? <MissionKindBadge /> : null}
+        </div>
         <p className="mt-(--space-2) text-sm text-charcoal/60">{missionMeta}</p>
         <p className="mt-(--space-4) text-xl font-bold tabular-nums text-black">{formatElapsed(elapsedMs)}</p>
       </div>

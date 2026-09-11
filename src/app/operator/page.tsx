@@ -2,7 +2,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getAppUser } from "@/lib/supabase/session";
 import { Eyebrow } from "@/components/ui/Eyebrow";
-import { MissionStatusBadge } from "@/components/ui/StatusBadge";
+import { MissionKindBadge, MissionStatusBadge } from "@/components/ui/StatusBadge";
 import type { City, Client, Mission, MissionStatus } from "@/lib/types";
 
 type Row = {
@@ -41,7 +41,10 @@ export default async function OperatorHome() {
               className="flex items-center justify-between gap-(--space-4) border-t border-line py-(--space-4) last:border-b focus-ring"
             >
               <div>
-                <div className="text-sm font-bold text-black">{mission.reference ?? "—"}</div>
+                <div className="flex items-center gap-(--space-2)">
+                  <span className="text-sm font-bold text-black">{mission.reference ?? "—"}</span>
+                  {mission.kind === "releve" ? <MissionKindBadge /> : null}
+                </div>
                 <div className="mt-1 text-xs text-charcoal/60">
                   {mission.city?.name ?? "?"} {mission.client ? `· ${mission.client.name}` : ""} · {mission.date}
                 </div>

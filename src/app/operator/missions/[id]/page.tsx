@@ -40,6 +40,7 @@ export default async function OperatorMissionPage({ params }: { params: Promise<
       cityName={typedMission.city?.name ?? "?"}
       clientName={typedMission.client?.name ?? null}
       date={typedMission.date}
+      kind={typedMission.kind}
     />
   );
 }
