@@ -84,3 +84,42 @@ export type AppUser = {
   client_id: string | null;
   city_id: string | null;
 };
+
+export type Report = {
+  id: string;
+  slug: string;
+  title: string;
+  client_id: string | null;
+  city_id: string | null;
+  date_from: string | null;
+  date_to: string | null;
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type ReportPhoto = {
+  id: string;
+  report_id: string;
+  storage_path: string;
+  position: number;
+  created_at: string;
+};
+
+// Shape returned by the get_public_report() RPC — the only view a
+// non-authenticated prospect ever gets of a report.
+export type PublicReport = {
+  title: string;
+  city_name: string | null;
+  releves: {
+    id: string;
+    troncon: string;
+    length_m: number;
+    count_aller: number;
+    count_retour: number;
+    density: Density;
+    recorded_at: string;
+    city_name: string;
+  }[];
+  photos: { storage_path: string }[];
+};

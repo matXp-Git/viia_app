@@ -6,7 +6,7 @@ import { signOut } from "@/lib/auth-actions";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { Logo } from "@/components/ui/Logo";
 
-export default async function RelevesLayout({ children }: { children: React.ReactNode }) {
+export default async function RapportsLayout({ children }: { children: React.ReactNode }) {
   const appUser = await getAppUser();
   if (!appUser) redirect("/login");
   if (appUser.role !== "commercial" && appUser.role !== "manager") redirect(roleHome(appUser.role));
@@ -18,12 +18,12 @@ export default async function RelevesLayout({ children }: { children: React.Reac
           <div>
             <Logo className="h-4 w-auto text-heading" />
             <div className="mt-(--space-2)">
-              <Eyebrow>Relevés terrain</Eyebrow>
+              <Eyebrow>Rapports prospection</Eyebrow>
             </div>
           </div>
           <nav className="flex flex-wrap items-center gap-(--space-5) text-xs uppercase tracking-label text-muted">
-            <Link href="/rapports" className="hover:text-heading">
-              Rapports
+            <Link href="/releves" className="hover:text-heading">
+              Relevés
             </Link>
             {appUser.role === "manager" ? (
               <Link href="/manager" className="hover:text-heading">

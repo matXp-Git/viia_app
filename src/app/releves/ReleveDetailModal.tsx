@@ -2,11 +2,8 @@
 
 import { useRef, useState } from "react";
 import type { Releve } from "@/lib/types";
-import { densityLabel, densityPerMeter, estimatedWeightKg } from "@/lib/density";
-import { ReportCardGrid } from "@/components/ui/ReportCardGrid";
-import { Eyebrow } from "@/components/ui/Eyebrow";
+import { ReleveCard } from "@/components/releve/ReleveCard";
 import { Button } from "@/components/ui/Button";
-import { Logo } from "@/components/ui/Logo";
 
 type Props = {
   releve: Releve;
@@ -18,9 +15,6 @@ export function ReleveDetailModal({ releve, cityName, onClose }: Props) {
   const cardRef = useRef<HTMLDivElement>(null);
   const [exporting, setExporting] = useState(false);
   const [exportError, setExportError] = useState<string | null>(null);
-
-  const perMeter = densityPerMeter(releve.count_aller, releve.count_retour, releve.length_m);
-  const totalDechets = releve.count_aller + releve.count_retour;
 
   async function handleExport() {
     if (!cardRef.current) return;
@@ -46,34 +40,16 @@ export function ReleveDetailModal({ releve, cityName, onClose }: Props) {
       onClick={onClose}
     >
       <div className="flex w-[400px] flex-col gap-(--space-5)" onClick={(e) => e.stopPropagation()}>
-        <div ref={cardRef} className="flex flex-col gap-(--space-5) border border-divider bg-page p-(--space-6)">
-          <div className="flex items-center justify-between">
-            <Logo className="h-3.5 w-auto text-heading" />
-            <Eyebrow>Relevé terrain</Eyebrow>
-          </div>
-
-          <div>
-            <div className="text-2xs uppercase tracking-label text-muted">{cityName}</div>
-            {/* Hauteur fixe (2 lignes) — un titre court comme un titre long
-                produisent toujours une fiche de la même taille en export PNG. */}
-            <h2 className="mt-(--space-1) line-clamp-2 min-h-[3.75rem] text-xl leading-tight text-heading">
-              {releve.troncon}
-            </h2>
-          </div>
-
-          <ReportCardGrid
-            columns={3}
-            className="max-w-none"
-            cells={[
-              { label: "Date", value: new Date(releve.recorded_at).toLocaleDateString("fr-FR") },
-              { label: "Longueur", value: `${releve.length_m.toLocaleString("fr-FR")} m` },
-              { label: "Total déchets", value: String(totalDechets), emphasis: true },
-              { label: "Déchets / m", value: perMeter !== null ? perMeter.toFixed(2) : "—" },
-              { label: "Densité", value: densityLabel[releve.density] },
-              { label: "Poids estimé", value: `${estimatedWeightKg(totalDechets).toLocaleString("fr-FR", { maximumFractionDigits: 1 })} kg` },
-            ]}
-          />
-        </div>
+        <ReleveCard
+          ref={cardRef}
+          troncon={releve.troncon}
+          cityName={cityName}
+          lengthM={releve.length_m}
+          countAller={releve.count_aller}
+          countRetour={releve.count_retour}
+          density={releve.density}
+          recordedAt={releve.recorded_at}
+        />
 
         <div className="flex flex-wrap items-center justify-end gap-(--space-4)">
           {exportError ? <p className="mr-auto text-xs text-critical">{exportError}</p> : null}
