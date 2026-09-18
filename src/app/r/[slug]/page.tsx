@@ -40,17 +40,20 @@ export default async function PublicReportPage({ params }: { params: Promise<{ s
         <div className="mt-(--space-7)">
           {report.city_name ? <div className="text-2xs uppercase tracking-label text-muted">{report.city_name}</div> : null}
           <h1 className="mt-(--space-1) text-display-lg text-heading">{report.title}</h1>
+          <p className="mt-(--space-2) max-w-[62ch] text-sm text-muted">
+            Ce rapport reprend l&apos;ensemble des relevés réalisés par ViiA sur la période.
+          </p>
         </div>
 
         {report.photos.length > 0 ? (
-          <div className="mt-(--space-7) grid grid-cols-2 gap-(--space-3) sm:grid-cols-3">
+          <div className="mt-(--space-7) flex flex-wrap gap-(--space-5)">
             {report.photos.map((photo) => (
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 key={photo.storage_path}
                 src={reportPhotoUrl(photo.storage_path)}
                 alt=""
-                className="aspect-square w-full border border-divider object-cover"
+                className="aspect-square w-[400px] border border-divider object-cover"
               />
             ))}
           </div>
