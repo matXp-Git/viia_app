@@ -45,20 +45,6 @@ export default async function PublicReportPage({ params }: { params: Promise<{ s
           </p>
         </div>
 
-        {report.photos.length > 0 ? (
-          <div className="mt-(--space-7) flex flex-wrap gap-(--space-5)">
-            {report.photos.map((photo) => (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                key={photo.storage_path}
-                src={reportPhotoUrl(photo.storage_path)}
-                alt=""
-                className="aspect-square w-[400px] border border-divider object-cover"
-              />
-            ))}
-          </div>
-        ) : null}
-
         <div className="mt-(--space-9) flex flex-wrap gap-(--space-5)">
           {report.releves.map((releve) => (
             <div key={releve.id} className="break-inside-avoid">
@@ -75,6 +61,20 @@ export default async function PublicReportPage({ params }: { params: Promise<{ s
           ))}
         </div>
         {report.releves.length === 0 ? <p className="mt-(--space-7) text-sm text-muted">Aucun relevé dans ce rapport.</p> : null}
+
+        {report.photos.length > 0 ? (
+          <div className="mt-(--space-9) flex flex-wrap gap-(--space-5)">
+            {report.photos.map((photo) => (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                key={photo.storage_path}
+                src={reportPhotoUrl(photo.storage_path)}
+                alt=""
+                className="aspect-square w-[400px] border border-divider object-cover"
+              />
+            ))}
+          </div>
+        ) : null}
       </div>
     </div>
   );
