@@ -123,11 +123,12 @@ export function ReportBuilder({ report, cities, clients, releves, initialSelecte
 
         const record = await addReportPhoto(report.id, path, position);
         if (record.error || !record.id) throw new Error(record.error);
+        const photoId = record.id;
 
         // The database id (not the file path) is what deleting relies on.
         setCurrentPhotos((prev) => [
           ...prev,
-          { id: record.id, report_id: report.id, storage_path: path, position, created_at: new Date().toISOString() },
+          { id: photoId, report_id: report.id, storage_path: path, position, created_at: new Date().toISOString() },
         ]);
         position += 1;
       } catch {
