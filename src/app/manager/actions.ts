@@ -215,6 +215,20 @@ export async function updateMissionAssignments(missionId: string, formData: Form
   await setMissionAssignments(missionId, operatorIds);
 }
 
+// Turns the database error behind a failed profile write into something the
+// manager can act on (the raw message stays server-side).
+function appUserErrorMessage(error: { code?: string; message?: string }, fallback: string): string {
+  if (error.code === "23505") return "Ce compte a déjà un profil ViiA Pick.";
+  if (error.code === "22P02") {
+    return "Identifiant invalide : collez la valeur de la colonne « User UID » (Supabase → Authentication → Users), pas l'e-mail.";
+  }
+  if (error.code === "23503" && error.message?.includes("app_user_id_fkey")) {
+    return "Aucun compte de connexion ne porte cet identifiant. Copiez la colonne « User UID » du compte (Supabase → Authentication → Users), sans espace.";
+  }
+  if (error.code === "23514") return "Le rôle choisi est incompatible avec l'entité sélectionnée.";
+  return fallback;
+}
+
 // ---- Provisioning des comptes -------------------------------------------------
 
 export async function createAppUser(_prevState: FormState, formData: FormData): Promise<FormState> {
@@ -240,10 +254,7 @@ export async function createAppUser(_prevState: FormState, formData: FormData): 
   });
 
   if (error) {
-    if (error.code === "23505") {
-      return { error: "Ce compte a déjà un profil ViiA Pick." };
-    }
-    return { error: "Erreur lors de la création du profil — vérifiez l'identifiant utilisateur." };
+    return { error: appUserErrorMessage(error, "Erreur lors de la création du profil — vérifiez l'identifiant utilisateur.") };
   }
 
   revalidatePath("/manager/utilisateurs");
@@ -274,7 +285,7 @@ export async function updateAppUser(userId: string, _prevState: FormState, formD
     .eq("id", userId);
 
   if (error) {
-    return { error: "Erreur lors de la modification du profil." };
+    return { error: appUserErrorMessage(error, "Erreur lors de la modification du profil.") };
   }
 
   revalidatePath("/manager/utilisateurs");
