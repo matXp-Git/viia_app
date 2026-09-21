@@ -5,6 +5,7 @@ import { roleHome } from "@/lib/roles";
 import { signOut } from "@/lib/auth-actions";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { Logo } from "@/components/ui/Logo";
+import { ClientHeader } from "@/components/ui/ClientHeader";
 
 export default async function CommandesLayout({ children }: { children: React.ReactNode }) {
   const appUser = await getAppUser();
@@ -13,15 +14,22 @@ export default async function CommandesLayout({ children }: { children: React.Re
     redirect(roleHome(appUser.role));
   }
 
+  if (appUser.role === "client") {
+    return (
+      <div data-theme="dark" className="min-h-screen bg-page text-body print:bg-white">
+        <ClientHeader role="client" />
+        <div className="mx-auto max-w-(--container-max) px-(--gutter) py-(--space-7)">{children}</div>
+      </div>
+    );
+  }
+
   const links: { href: string; label: string }[] =
-    appUser.role === "client"
-      ? [{ href: "/portal", label: "Suivi de collecte" }]
-      : appUser.role === "manager"
-        ? [{ href: "/manager", label: "← Manager" }]
-        : [
-            { href: "/releves", label: "Relevés" },
-            { href: "/rapports", label: "Rapports" },
-          ];
+    appUser.role === "manager"
+      ? [{ href: "/manager", label: "← Manager" }]
+      : [
+          { href: "/releves", label: "Relevés" },
+          { href: "/rapports", label: "Rapports" },
+        ];
 
   return (
     <div data-theme="dark" className="min-h-screen bg-page text-body print:bg-white">
