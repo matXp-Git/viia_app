@@ -110,19 +110,29 @@ export function ReportBuilder({ report, cities, clients, releves, initialSelecte
     setUploadError(null);
     const supabase = createBrowserSupabaseClient();
 
+    let position = currentPhotos.length;
+
     for (const file of files) {
+      let uploadedPath: string | null = null;
       try {
         const blob = await compressImage(file);
         const path = `${report.id}/${crypto.randomUUID()}.jpg`;
         const { error } = await supabase.storage.from(REPORT_PHOTOS_BUCKET).upload(path, blob, { contentType: "image/jpeg" });
         if (error) throw error;
-        const position = currentPhotos.length;
-        await addReportPhoto(report.id, path, position);
+        uploadedPath = path;
+
+        const record = await addReportPhoto(report.id, path, position);
+        if (record.error || !record.id) throw new Error(record.error);
+
+        // The database id (not the file path) is what deleting relies on.
         setCurrentPhotos((prev) => [
           ...prev,
-          { id: path, report_id: report.id, storage_path: path, position, created_at: new Date().toISOString() },
+          { id: record.id, report_id: report.id, storage_path: path, position, created_at: new Date().toISOString() },
         ]);
+        position += 1;
       } catch {
+        // Don't leave an uploaded file that no report row points to.
+        if (uploadedPath) await supabase.storage.from(REPORT_PHOTOS_BUCKET).remove([uploadedPath]);
         setUploadError("Échec de l'envoi d'une photo — réessaie.");
       }
     }
@@ -130,8 +140,16 @@ export function ReportBuilder({ report, cities, clients, releves, initialSelecte
   }
 
   function handleDeletePhoto(photoId: string) {
+    const removed = currentPhotos.find((p) => p.id === photoId);
     setCurrentPhotos((prev) => prev.filter((p) => p.id !== photoId));
-    startSaving(() => deleteReportPhoto(photoId));
+    setUploadError(null);
+    startSaving(async () => {
+      const result = await deleteReportPhoto(photoId);
+      if (result.error && removed) {
+        setCurrentPhotos((prev) => [...prev, removed].sort((a, b) => a.position - b.position));
+        setUploadError(result.error);
+      }
+    });
   }
 
   const publicPath = `/r/${report.slug}`;

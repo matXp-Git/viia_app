@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getAppUser } from "@/lib/supabase/session";
@@ -82,33 +83,68 @@ export async function saveReport(reportId: string, input: SaveReportInput): Prom
   return {};
 }
 
-export async function addReportPhoto(reportId: string, storagePath: string, position: number) {
+export async function addReportPhoto(
+  reportId: string,
+  storagePath: string,
+  position: number,
+): Promise<{ id?: string; error?: string }> {
   await requireCommercialOrManager();
   const supabase = await createClient();
-  await supabase.from("report_photo").insert({ report_id: reportId, storage_path: storagePath, position });
+  const { data, error } = await supabase
+    .from("report_photo")
+    .insert({ report_id: reportId, storage_path: storagePath, position })
+    .select("id")
+    .single();
+  if (error || !data) return { error: "Photo non enregistrée." };
   revalidatePath(`/rapports/${reportId}`);
+  return { id: data.id as string };
 }
 
-export async function deleteReportPhoto(photoId: string) {
+// Removes the files and confirms they're really gone. The storage API answers
+// "success" with an empty list when a delete is silently refused (a policy
+// hiding the row), so success alone isn't proof.
+async function removePhotoFiles(supabase: SupabaseClient, paths: string[]): Promise<boolean> {
+  if (paths.length === 0) return true;
+  const storage = supabase.storage.from(REPORT_PHOTOS_BUCKET);
+
+  const { error } = await storage.remove(paths);
+  if (error) return false;
+
+  for (const path of paths) {
+    const { data: stillThere, error: existsError } = await storage.exists(path);
+    if (!existsError && stillThere) return false;
+  }
+  return true;
+}
+
+export async function deleteReportPhoto(photoId: string): Promise<{ error?: string }> {
   await requireCommercialOrManager();
   const supabase = await createClient();
 
   const { data: photo } = await supabase.from("report_photo").select("report_id, storage_path").eq("id", photoId).single();
-  if (!photo) return;
+  if (!photo) return { error: "Photo introuvable." };
 
-  await supabase.storage.from(REPORT_PHOTOS_BUCKET).remove([photo.storage_path]);
+  // File first: if it can't be erased we keep the database row, so nothing
+  // is left behind that is still publicly reachable but no longer listed.
+  if (!(await removePhotoFiles(supabase, [photo.storage_path]))) {
+    return { error: "La photo n'a pas pu être supprimée du stockage. Réessayez." };
+  }
+
   await supabase.from("report_photo").delete().eq("id", photoId);
   revalidatePath(`/rapports/${photo.report_id}`);
+  return {};
 }
 
-export async function deleteReport(reportId: string) {
+export async function deleteReport(reportId: string): Promise<{ error?: string }> {
   await requireCommercialOrManager();
   const supabase = await createClient();
 
   const { data: photos } = await supabase.from("report_photo").select("storage_path").eq("report_id", reportId);
-  if (photos && photos.length > 0) {
-    await supabase.storage.from(REPORT_PHOTOS_BUCKET).remove(photos.map((p) => p.storage_path));
+  if (!(await removePhotoFiles(supabase, (photos ?? []).map((p) => p.storage_path as string)))) {
+    return { error: "Les photos n'ont pas pu être supprimées du stockage. Le rapport n'a pas été supprimé." };
   }
+
   await supabase.from("report").delete().eq("id", reportId);
   revalidatePath("/rapports");
+  return {};
 }

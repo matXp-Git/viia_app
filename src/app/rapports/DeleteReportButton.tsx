@@ -8,7 +8,10 @@ export function DeleteReportButton({ id }: { id: string }) {
 
   function handleDelete() {
     if (!confirm("Supprimer ce rapport et ses photos ? Le lien public cessera de fonctionner.")) return;
-    startTransition(() => deleteReport(id));
+    startTransition(async () => {
+      const result = await deleteReport(id);
+      if (result.error) alert(result.error);
+    });
   }
 
   return (
