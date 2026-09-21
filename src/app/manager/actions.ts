@@ -287,3 +287,65 @@ export async function deleteAppUser(userId: string) {
   await supabase.from("app_user").delete().eq("id", userId);
   revalidatePath("/manager/utilisateurs");
 }
+
+// ---- Tarifs & commandes -------------------------------------------------------
+
+function parseAmount(raw: FormDataEntryValue | string | null): number | null {
+  const normalized = String(raw ?? "").trim().replace(",", ".");
+  if (normalized === "") return null;
+  const value = Number(normalized);
+  if (!Number.isFinite(value) || value < 0 || value > 100000) return NaN;
+  return Math.round(value * 100) / 100;
+}
+
+export async function updatePricing(_prevState: FormState, formData: FormData): Promise<FormState> {
+  await requireManager();
+  const pricePerStreet = parseAmount(formData.get("price_per_street"));
+  const fee = parseAmount(formData.get("discontinuity_fee"));
+  const mode = String(formData.get("price_mode") ?? "");
+
+  if (pricePerStreet === null || Number.isNaN(pricePerStreet)) {
+    return { error: "Prix par rue invalide." };
+  }
+  if (fee === null || Number.isNaN(fee)) {
+    return { error: "Forfait de coupure invalide." };
+  }
+  if (mode !== "ttc" && mode !== "ht") {
+    return { error: "Choisissez TTC ou HT." };
+  }
+
+  const supabase = await createSupabaseClient();
+  const { data, error } = await supabase
+    .from("pricing_setting")
+    .update({ price_per_street: pricePerStreet, discontinuity_fee: fee, price_mode: mode, updated_at: new Date().toISOString() })
+    .eq("id", true)
+    .select("id");
+
+  if (error || !data || data.length === 0) {
+    return { error: "Erreur lors de l'enregistrement des tarifs." };
+  }
+
+  revalidatePath("/manager/tarifs");
+  revalidatePath("/commandes");
+  return { success: true };
+}
+
+// Empty amount clears the final price (back to "estimate only").
+export async function setOrderFinalAmount(orderId: string, missionId: string, rawAmount: string): Promise<FormState> {
+  await requireManager();
+  const amount = parseAmount(rawAmount);
+  if (Number.isNaN(amount)) {
+    return { error: "Montant invalide." };
+  }
+
+  const supabase = await createSupabaseClient();
+  const { data, error } = await supabase.from("client_order").update({ final_amount: amount }).eq("id", orderId).select("id");
+
+  if (error || !data || data.length === 0) {
+    return { error: "Erreur lors de l'enregistrement du montant final." };
+  }
+
+  revalidatePath(`/manager/missions/${missionId}`);
+  revalidatePath("/commandes");
+  return { success: true };
+}

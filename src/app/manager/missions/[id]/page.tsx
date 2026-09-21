@@ -7,7 +7,9 @@ import { TrackMap, type TrackFeature, type DumpFeature } from "@/components/map/
 import { LivePulse } from "@/components/ui/LivePulse";
 import { AutoRefresh } from "@/components/ui/AutoRefresh";
 import { isRecentlyActive } from "@/lib/liveActivity";
-import type { City, Client, Mission, Operator, TrackSegment, Weighing, WildDump } from "@/lib/types";
+import { delayLabel, timeSlotLabel } from "@/lib/orders";
+import type { City, Client, ClientOrder, Mission, Operator, TrackSegment, Weighing, WildDump } from "@/lib/types";
+import { FinalAmountForm } from "./FinalAmountForm";
 
 function formatDuration(ms: number): string {
   const minutes = Math.round(ms / 60000);
@@ -27,12 +29,14 @@ export default async function ManagerMissionDetailPage({ params }: { params: Pro
     { data: segments },
     { data: weighings },
     { data: dumps },
+    { data: orderData },
   ] = await Promise.all([
     supabase.from("mission").select("*, city:city_id(*), client:client_id(*)").eq("id", id).single(),
     supabase.from("mission_assignment").select("*, operator:operator_id(*)").eq("mission_id", id),
     supabase.from("track_segment").select("*").eq("mission_id", id).order("created_at"),
     supabase.from("weighing").select("*").eq("mission_id", id).order("recorded_at"),
     supabase.from("wild_dump").select("*").eq("mission_id", id).order("reported_at"),
+    supabase.from("client_order").select("*").eq("mission_id", id).maybeSingle(),
   ]);
 
   if (!mission) notFound();
@@ -41,6 +45,7 @@ export default async function ManagerMissionDetailPage({ params }: { params: Pro
   const typedSegments = (segments ?? []) as TrackSegment[];
   const typedWeighings = (weighings ?? []) as Weighing[];
   const typedDumps = (dumps ?? []) as WildDump[];
+  const order = orderData as ClientOrder | null;
   const operators = (assignments ?? []) as { operator_id: string; operator: Operator | null }[];
 
   const segmentIds = typedSegments.map((s) => s.id);
@@ -158,7 +163,33 @@ export default async function ManagerMissionDetailPage({ params }: { params: Pro
         ← Retour aux missions
       </Link>
 
-      <div className="mt-(--space-7) grid grid-cols-3 gap-px border border-divider bg-divider mobile:grid-cols-1">
+      {typedMission.streets.length > 0 || order ? (
+        <div className="mt-(--space-7)">
+          <Eyebrow>Commande</Eyebrow>
+          <div className="mt-(--space-3) grid gap-(--space-5) tablet:grid-cols-2">
+            <div className="border border-divider p-(--space-4)">
+              <div className="text-2xs uppercase tracking-label text-muted">Rues ({typedMission.streets.length})</div>
+              <ol className="mt-(--space-2) list-decimal pl-(--space-5) text-sm text-heading">
+                {typedMission.streets.map((street, index) => (
+                  <li key={index}>{street}</li>
+                ))}
+              </ol>
+              {order ? (
+                <p className="mt-(--space-3) text-xs text-muted">Délai : {delayLabel(order)}</p>
+              ) : null}
+              {typedMission.time_slot ? (
+                <p className="mt-(--space-1) text-xs text-muted">Créneau : {timeSlotLabel[typedMission.time_slot]}</p>
+              ) : null}
+              {typedMission.remark ? (
+                <p className="mt-(--space-2) whitespace-pre-line text-sm text-body">{typedMission.remark}</p>
+              ) : null}
+            </div>
+            {order ? <FinalAmountForm order={order} missionId={typedMission.id} /> : null}
+          </div>
+        </div>
+      ) : null}
+
+      <div className="mt-(--space-7) grid grid-cols-3 gap-px border border-divider bg-divider max-mobile:grid-cols-1">
         <div className="bg-surface p-(--space-4)">
           <div className="text-2xs uppercase text-muted">Total collecté</div>
           <div className="mt-(--space-2) text-sm font-bold text-heading">{missionKilosTotal.toFixed(1)} kg</div>

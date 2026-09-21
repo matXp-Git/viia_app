@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/Button";
 import { TextField } from "@/components/ui/Field";
 import { LivePulse } from "@/components/ui/LivePulse";
 import { MissionKindBadge } from "@/components/ui/StatusBadge";
-import type { MissionKind } from "@/lib/types";
+import { timeSlotLabel } from "@/lib/orders";
+import type { MissionKind, TimeSlot } from "@/lib/types";
 import { recordPoint, reportWildDump, startSegment, submitWeighing, type WeighingState } from "./actions";
 
 // GPS points every 4s (spec: 3-5s), points with worse than 50m accuracy are
@@ -20,6 +21,9 @@ type Props = {
   clientName: string | null;
   date: string;
   kind: MissionKind;
+  streets: string[];
+  timeSlot: TimeSlot | null;
+  remark: string | null;
 };
 
 const weighingInitial: WeighingState = {};
@@ -40,7 +44,7 @@ function formatElapsed(ms: number): string {
   return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
 }
 
-export function MissionRunner({ missionId, reference, cityName, clientName, date, kind }: Props) {
+export function MissionRunner({ missionId, reference, cityName, clientName, date, kind, streets, timeSlot, remark }: Props) {
   const [activeSegmentId, setActiveSegmentId] = useState<string | null>(null);
   const [tracking, setTracking] = useState(true);
   const [accuracy, setAccuracy] = useState<number | null>(null);
@@ -192,6 +196,25 @@ export function MissionRunner({ missionId, reference, cityName, clientName, date
     setElapsedMs(0);
   }
 
+
+  const brief =
+    streets.length > 0 || remark || timeSlot ? (
+      <details className="mt-(--space-5) w-full border border-line p-(--space-4) text-left" open={!activeSegmentId}>
+        <summary className="cursor-pointer text-xs uppercase tracking-label text-charcoal/60">
+          Rues de la mission ({streets.length})
+        </summary>
+        <ol className="mt-(--space-3) list-decimal pl-(--space-5) text-sm text-black">
+          {streets.map((street, index) => (
+            <li key={index} className="py-0.5">
+              {street}
+            </li>
+          ))}
+        </ol>
+        {timeSlot ? <p className="mt-(--space-3) text-xs text-charcoal/60">Créneau : {timeSlotLabel[timeSlot]}</p> : null}
+        {remark ? <p className="mt-(--space-2) whitespace-pre-line text-sm text-black">{remark}</p> : null}
+      </details>
+    ) : null;
+
   const missionMeta = `${cityName}${clientName ? ` · ${clientName}` : ""} · ${date}`;
 
   if (!activeSegmentId) {
@@ -202,6 +225,7 @@ export function MissionRunner({ missionId, reference, cityName, clientName, date
           <h1 className="text-display-lg">{reference}</h1>
           {kind === "releve" ? <MissionKindBadge /> : null}
         </div>
+        {brief}
         <Button variant="accent" onClick={() => handleStart("vehicle")} disabled={pending} className="mt-(--space-7)">
           {pending ? "Démarrage..." : "Démarrer la mission →"}
         </Button>
@@ -230,6 +254,7 @@ export function MissionRunner({ missionId, reference, cityName, clientName, date
         <p className="mt-(--space-2) text-sm text-charcoal/60">{missionMeta}</p>
         <p className="mt-(--space-4) text-xl font-bold tabular-nums text-black">{formatElapsed(elapsedMs)}</p>
       </div>
+      {brief}
 
       {tracking ? (
         <>

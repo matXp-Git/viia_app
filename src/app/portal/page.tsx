@@ -120,7 +120,7 @@ export default async function PortalHome({ searchParams }: { searchParams: Promi
         </Button>
       </form>
 
-      <div className="mt-(--space-7) grid grid-cols-3 gap-px border border-divider bg-divider mobile:grid-cols-1">
+      <div className="mt-(--space-7) grid grid-cols-3 gap-px border border-divider bg-divider max-mobile:grid-cols-1">
         <div className="bg-surface p-(--space-4)">
           <div className="text-2xs uppercase text-muted">Total collecté</div>
           <div className="mt-(--space-2) text-sm font-bold text-heading">{kilosTotal.toFixed(1)} kg</div>

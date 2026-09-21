@@ -17,6 +17,10 @@ export type Operator = {
   status: OperatorStatus;
 };
 
+export type TimeSlot = "matin" | "apres_midi";
+export type DelayType = "date" | "within_days";
+export type PriceMode = "ttc" | "ht";
+
 export type Mission = {
   id: string;
   reference: string | null;
@@ -26,8 +30,51 @@ export type Mission = {
   status: MissionStatus;
   kind: MissionKind;
   note: string | null;
+  streets: string[];
+  time_slot: TimeSlot | null;
+  remark: string | null;
   started_at: string | null;
   ended_at: string | null;
+};
+
+export type Zone = {
+  id: string;
+  client_id: string;
+  city_id: string;
+  name: string;
+  created_at: string;
+  updated_at: string;
+};
+
+export type ZoneStreet = {
+  id: string;
+  zone_id: string;
+  name: string;
+  position: number;
+};
+
+export type PricingSetting = {
+  price_per_street: number;
+  discontinuity_fee: number;
+  price_mode: PriceMode;
+};
+
+export type ClientOrder = {
+  id: string;
+  mission_id: string;
+  zone_id: string;
+  client_id: string;
+  delay_type: DelayType;
+  within_days: number | null;
+  target_date: string;
+  street_count: number;
+  unit_price: number;
+  discontinuity_fee: number;
+  price_mode: PriceMode;
+  estimated_amount: number;
+  final_amount: number | null;
+  created_by: string | null;
+  created_at: string;
 };
 
 export type MissionAssignment = {

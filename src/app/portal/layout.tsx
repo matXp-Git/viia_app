@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getAppUser } from "@/lib/supabase/session";
 import { roleHome } from "@/lib/roles";
@@ -13,11 +14,18 @@ export default async function PortalLayout({ children }: { children: React.React
     <div data-theme="dark" className="min-h-screen bg-page text-body">
       <div className="flex items-center justify-between px-(--gutter) pt-(--space-4)">
         <Logo className="h-4 w-auto text-heading" />
-        <form action={signOut}>
-          <button type="submit" className="text-xs uppercase tracking-label text-muted focus-ring hover:text-heading">
-            Déconnexion →
-          </button>
-        </form>
+        <div className="flex items-center gap-(--space-5) text-xs uppercase tracking-label text-muted">
+          {appUser.role === "client" ? (
+            <Link href="/commandes" className="hover:text-heading">
+              Commandes
+            </Link>
+          ) : null}
+          <form action={signOut}>
+            <button type="submit" className="text-xs uppercase tracking-label text-muted focus-ring hover:text-heading">
+              Déconnexion →
+            </button>
+          </form>
+        </div>
       </div>
       {children}
     </div>

@@ -7,6 +7,7 @@ export function roleHome(role: Role): string {
     case "manager":
       return "/manager";
     case "client":
+      return "/commandes";
     case "city":
       return "/portal";
     case "commercial":

@@ -4,6 +4,7 @@ import type { PublicReport } from "@/lib/types";
 import { reportPhotoUrl } from "@/lib/storage";
 import { ReleveCard } from "@/components/releve/ReleveCard";
 import { Logo } from "@/components/ui/Logo";
+import { PrintLightScope } from "@/components/ui/PrintLightScope";
 import { PrintButton } from "./PrintButton";
 
 export default async function PublicReportPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -16,21 +17,8 @@ export default async function PublicReportPage({ params }: { params: Promise<{ s
   const report = data as PublicReport;
 
   return (
-    <div data-theme="dark" className="report-print min-h-screen bg-page text-body">
-      <style>{`
-        @media print {
-          .report-print {
-            --color-page: #ffffff;
-            --color-surface: #ffffff;
-            --color-heading: #000000;
-            --color-body: #222222;
-            --color-muted: #555555;
-            --color-divider: #cccccc;
-            color-scheme: light;
-          }
-        }
-      `}</style>
-
+    <div data-theme="dark" className="min-h-screen bg-page text-body print:bg-white">
+      <PrintLightScope>
       <div className="mx-auto max-w-(--container-max) px-(--gutter) py-(--space-9)">
         <div className="flex flex-wrap items-center justify-between gap-(--space-4)">
           <Logo className="h-5 w-auto text-heading" />
@@ -76,6 +64,7 @@ export default async function PublicReportPage({ params }: { params: Promise<{ s
           </div>
         ) : null}
       </div>
+      </PrintLightScope>
     </div>
   );
 }

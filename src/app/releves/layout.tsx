@@ -25,6 +25,9 @@ export default async function RelevesLayout({ children }: { children: React.Reac
             <Link href="/rapports" className="hover:text-heading">
               Rapports
             </Link>
+            <Link href="/commandes" className="hover:text-heading">
+              Commandes
+            </Link>
             {appUser.role === "manager" ? (
               <Link href="/manager" className="hover:text-heading">
                 ← Manager

@@ -1,4 +1,4 @@
-import type { InputHTMLAttributes, SelectHTMLAttributes } from "react";
+import type { InputHTMLAttributes, SelectHTMLAttributes, TextareaHTMLAttributes } from "react";
 
 const controlBase =
   "bg-transparent border border-divider rounded-sm px-(--space-3) py-(--space-3) text-sm text-body focus-ring disabled:opacity-45 disabled:cursor-not-allowed";
@@ -32,6 +32,23 @@ export function TextField({ label, error, className, ...props }: TextFieldProps)
     <FieldWrapper label={label} error={error} className={className}>
       <input
         className={`${controlBase} ${error ? "border-critical" : ""}`}
+        aria-invalid={Boolean(error)}
+        {...props}
+      />
+    </FieldWrapper>
+  );
+}
+
+type TextAreaFieldProps = TextareaHTMLAttributes<HTMLTextAreaElement> & {
+  label: string;
+  error?: string;
+};
+
+export function TextAreaField({ label, error, className, ...props }: TextAreaFieldProps) {
+  return (
+    <FieldWrapper label={label} error={error} className={className}>
+      <textarea
+        className={`${controlBase} min-h-[96px] resize-y ${error ? "border-critical" : ""}`}
         aria-invalid={Boolean(error)}
         {...props}
       />
