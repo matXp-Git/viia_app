@@ -46,6 +46,8 @@ export default async function ManagerMissionDetailPage({ params }: { params: Pro
   const typedWeighings = (weighings ?? []) as Weighing[];
   const typedDumps = (dumps ?? []) as WildDump[];
   const order = orderData as ClientOrder | null;
+  // Tolerates rows read before migration 0008 adds the column.
+  const missionStreets = typedMission.streets ?? [];
   const operators = (assignments ?? []) as { operator_id: string; operator: Operator | null }[];
 
   const segmentIds = typedSegments.map((s) => s.id);
@@ -163,14 +165,14 @@ export default async function ManagerMissionDetailPage({ params }: { params: Pro
         ← Retour aux missions
       </Link>
 
-      {typedMission.streets.length > 0 || order ? (
+      {missionStreets.length > 0 || order ? (
         <div className="mt-(--space-7)">
           <Eyebrow>Commande</Eyebrow>
           <div className="mt-(--space-3) grid gap-(--space-5) tablet:grid-cols-2">
             <div className="border border-divider p-(--space-4)">
-              <div className="text-2xs uppercase tracking-label text-muted">Rues ({typedMission.streets.length})</div>
+              <div className="text-2xs uppercase tracking-label text-muted">Rues ({missionStreets.length})</div>
               <ol className="mt-(--space-2) list-decimal pl-(--space-5) text-sm text-heading">
-                {typedMission.streets.map((street, index) => (
+                {missionStreets.map((street, index) => (
                   <li key={index}>{street}</li>
                 ))}
               </ol>

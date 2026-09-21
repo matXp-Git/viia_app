@@ -41,7 +41,7 @@ export default async function OperatorMissionPage({ params }: { params: Promise<
       clientName={typedMission.client?.name ?? null}
       date={typedMission.date}
       kind={typedMission.kind}
-      streets={typedMission.streets}
+      streets={typedMission.streets ?? []}
       timeSlot={typedMission.time_slot}
       remark={typedMission.remark}
     />
