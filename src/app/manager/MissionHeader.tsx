@@ -60,7 +60,6 @@ export function MissionHeader({ mission, city, client, cities, clients, isLive =
           <div className="mt-1 text-xs text-muted">
             {city?.name ?? "?"} · {client?.name ?? "Sans client"} · {mission.date}
           </div>
-          {mission.note ? <div className="mt-1 text-xs text-body">{mission.note}</div> : null}
         </div>
         <div className="flex items-center gap-(--space-4)">
           {canEdit ? (

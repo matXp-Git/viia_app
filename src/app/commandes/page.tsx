@@ -5,7 +5,7 @@ import { Button, LinkButton } from "@/components/ui/Button";
 import { SelectField } from "@/components/ui/Field";
 import { MissionStatusBadge } from "@/components/ui/StatusBadge";
 import { formatEuro, priceModeLabel } from "@/lib/pricing";
-import { formatDateFr } from "@/lib/orders";
+import { formatDateFr, timeSlotLabel } from "@/lib/orders";
 import type { City, ClientOrder, Mission, Zone } from "@/lib/types";
 import { getOrderingContext } from "./context";
 import { ZoneActions } from "./ZoneActions";
@@ -86,6 +86,17 @@ export default async function CommandesDashboard({ searchParams }: { searchParam
                     .filter(Boolean)
                     .join(" · ")}
                 </div>
+                {(mission.streets ?? []).length > 0 ? (
+                  <div className="mt-(--space-2) max-w-[70ch] text-xs text-body">
+                    Rues ({mission.streets.length}) : {mission.streets.join(" · ")}
+                  </div>
+                ) : null}
+                {mission.time_slot ? (
+                  <div className="mt-1 text-xs text-muted">Créneau : {timeSlotLabel[mission.time_slot]}</div>
+                ) : null}
+                {mission.remark ? (
+                  <div className="mt-1 max-w-[70ch] whitespace-pre-line text-xs text-muted">Remarque : {mission.remark}</div>
+                ) : null}
               </div>
               <div className="flex flex-wrap items-center justify-end gap-(--space-4)">
                 {order ? (
